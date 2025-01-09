@@ -1,0 +1,79 @@
+{
+	"AggregationKey": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+	"Category": "iCube Engineer Help File",
+	"Content": "iCube Engineer Online Help\n        \n\n        \n            You must have JavaScript enabled to use the Online Help.\n\n        \n\n    \n\n    \n        \n            \n\n                SF_Reset\n            \n\n        \n\n\n\n\nHelp version 2.0 / Issue date: 2024.03\nThe following description is valid for the function block SF_Reset_V1_0z, Version 1.0z (where z = 0 to 9).\n\n\n\n\n\t\n\t\t\t\t\t\t\t\t\t\tShort Description\n\t\t\t\t\t\t\t\t\t\tThe SF_Reset function block provides a manual reset function. The reset signal at the ResetOut output takes place as a short TRUE pulse with a length of one cycle of the Safety PLC, if a manual reset is requested at the ResetIn input....",
+	"DocumentType": "Document",
+	"DownloadLink": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+	"FileName": "sfresetV20.htm",
+	"FileName_sort": "N4L2N2PT=17=13=088PB=01=12=01=BF=DC\n",
+	"FilePath": "1719926565798/D:\\Empolis-DataSource\\Help Files\\Motion Controller\\iCube Engineer\\sfresetV20.htm",
+	"FileSize": 287483,
+	"Language": "en",
+	"ModificationDate": "2024-08-28",
+	"ModificationDate_day": "2024-08-28",
+	"ModificationDate_month": "2024-08",
+	"ModificationDate_year": "2024",
+	"ModificationTimestamp": "2024-08-28T05:56:00",
+	"Source": "1719926565798",
+	"SourceLink": "D:\\Empolis-DataSource\\Help Files\\Motion Controller\\iCube Engineer\\sfresetV20.htm",
+	"Title": "sfresetV20.htm",
+	"Title_sort": "N4L2N2PT=17=13=088PB=01=12=01=BF=DC\n",
+	"_kmVersion": "2024-06-14T13:16:58.000Z",
+	"_language": "en",
+	"_recordid": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+	"_revision": 1724834673919,
+	"_timestamp": 1724834673919,
+	"doctype": [
+		"DocumentType_Certificate\u001FDocumentType_Safety",
+		"DocumentType_Technical Manual"
+	],
+	"doctype_tax": [
+		"DocumentType_Certificate",
+		"DocumentType_Certificate\u001FDocumentType_Safety",
+		"DocumentType_Technical Manual"
+	],
+	"doctype_taxnode": [
+		"1\u001FDocumentType_Technical Manual",
+		"2\u001FDocumentType_Certificate\u001FDocumentType_Safety"
+	],
+	"dokumentenherkunft": [
+		"Document Origin_YAI",
+		"Document Origin_YEU"
+	],
+	"dokumentenherkunft_tax": [
+		"Document Origin_YAI",
+		"Document Origin_YEU"
+	],
+	"dokumentenherkunft_taxnode": [
+		"1\u001FDocument Origin_YAI",
+		"1\u001FDocument Origin_YEU"
+	],
+	"esc_CreationDate": "2024-08-28",
+	"esc_CreationDate_day": "2024-08-28",
+	"esc_CreationDate_month": "2024-08",
+	"esc_CreationDate_year": "2024",
+	"esc_CreationTimestamp": "2024-08-28T05:56:00",
+	"esc_Languages": [
+		"en"
+	],
+	"esc_unitId": "iu-624-126b086f-4461-4d66-bbf6-959edd31fb22",
+	"product": [
+		"Product_Motion",
+		"Product_Motion\u001FProduct_Motion_Motion Controller",
+		"Product_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_b_Integrated Development Environment\u001FProduct_Integrated Development Environment_a_iCube Engineer",
+		"Product_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_iCube"
+	],
+	"product_tax": [
+		"Product_Motion",
+		"Product_Motion\u001FProduct_Motion_Motion Controller",
+		"Product_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_b_Integrated Development Environment",
+		"Product_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_b_Integrated Development Environment\u001FProduct_Integrated Development Environment_a_iCube Engineer",
+		"Product_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_iCube"
+	],
+	"product_taxnode": [
+		"1\u001FProduct_Motion",
+		"2\u001FProduct_Motion\u001FProduct_Motion_Motion Controller",
+		"3\u001FProduct_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_iCube",
+		"4\u001FProduct_Motion\u001FProduct_Motion_Motion Controller\u001FProduct_Motion Controller_b_Integrated Development Environment\u001FProduct_Integrated Development Environment_a_iCube Engineer"
+	]
+}

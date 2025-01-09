@@ -1,0 +1,76 @@
+{
+	"count": 1,
+	"numberOfTotalDocuments": 3364,
+	"numberOfTotalRecords": 6872,
+	"records": [
+		{
+			"AggregationKey": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+			"Category": "iCube Engineer Help File",
+			"Comment_txt": "",
+			"Content": "iCube Engineer Online Help\n        \n\n        \n            You must have JavaScript enabled to use the Online Help.\n\n        \n\n    \n\n    \n        \n            \n\n                SF_Reset\n            \n\n        \n\n\n\n\nHelp version 2.0 / Issue date: ... ",
+			"DocumentType": "Document",
+			"DownloadLink": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+			"FileName": "<hit>sfresetV20</hit>.<hit>htm</hit>",
+			"FilePath": "1719926565798/D:\\Empolis-DataSource\\Help Files\\Motion Controller\\iCube Engineer\\sfresetV20.htm",
+			"FileSize": 287483,
+			"Label": "",
+			"Language": "en",
+			"Memo_LongText_txt": "",
+			"ModificationDate": "2024-08-28",
+			"ModificationTimestamp": "2024-08-28T05:56:00",
+			"Phrase": "",
+			"Source": "1719926565798",
+			"SourceLink": "D:\\Empolis-DataSource\\Help Files\\Motion Controller\\iCube Engineer\\sfresetV20.htm",
+			"Title": "<hit>sfresetV20</hit>.<hit>htm</hit>",
+			"_id": "YWM0NDNlNjQtMjAzMy00OGY5LThlY2EtNWMwNDIzMzkxMGM1VwcAAA",
+			"_recordid": "environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer/sfresetV20.htm",
+			"_score": 0.8320666666666666,
+			"abstract": {
+				"Content": "iCube Engineer Online Help\n        \n\n        \n            You must have JavaScript enabled to use the Online Help.\n\n        \n\n    \n\n    \n        \n            \n\n                SF_Reset\n            \n\n        \n\n\n\n\nHelp version 2.0 / Issue date: 2024.03\nThe following description is valid for the function block SF_Reset_V1_0z, Version 1.0z (where z = 0 to 9).\n\n\n\n\n\t\n\t\t\t\t\t\t\t\t\t\tShort Description\n\t\t\t\t\t\t\t\t\t\tThe SF_Reset function block provides a manual reset function. The reset signal at the ResetOut output takes place as a short TRUE pulse with a length of one cycle of the Safety PLC, if a manual reset is requested at the ResetIn input.\n\n\n\tNote\n\nAlthough contained in the safety-related PLCopen_SF library, the SF_Reset FB is a standard (non-safety-related) function block with standard input and output formal parameters.\n\n\n\n\nThe reset request is triggered by the operator by means of a connected control device (e.g., a button). \nFunction block inputs are available to specify whether a rising or a falling edge (according to EN ISO 13849-1) is evaluated at the ResetIn input.\nIn addition, when evaluating the falling edge, the duration of the request signal can be monitored.\n\nThe request signal at the ResetIn input is only evaluated if the OperationStop input signals that the system is in operation stop mode.   \n\t\n\t\t\t\t\t\t\t\t\t\tBlock Icon\n\t\t\t\t\t\t\t\t\t\t\n\n\t\n\t\t\t\t\t\t\t\t\t\tInputs\n\t\t\t\t\t\t\t\t\t\t\nActivate\n\n\n\tShort description\tValue\n\t\n\t\t\t\t\t\t\t\t\tState-controlled input ... "
+			},
+			"doctype": [
+				[
+					"Certificate",
+					"Safety"
+				],
+				[
+					"Technical Manual"
+				]
+			],
+			"dokumentenherkunft": [
+				[
+					"YAI"
+				],
+				[
+					"YEU"
+				]
+			],
+			"esc_CreationDate": "2024-08-28",
+			"esc_CreationTimestamp": "2024-08-28T05:56:00",
+			"esc_Languages": [
+				"en"
+			],
+			"esc_unitId": "iu-624-126b086f-4461-4d66-bbf6-959edd31fb22",
+			"product": [
+				[
+					"Motion"
+				],
+				[
+					"Motion",
+					"Motion Controller"
+				],
+				[
+					"Motion",
+					"Motion Controller",
+					"Integrated Development Environment",
+					"iCube Engineer"
+				],
+				[
+					"Motion",
+					"Motion Controller",
+					"iCube"
+				]
+			]
+		}
+	]
+}

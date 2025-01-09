@@ -1,0 +1,27 @@
+{
+    "opts": {
+        "encoding": "utf8",
+        "readme": "./README.md",
+        "destination": "./jsdoc/",
+        "recurse": true,
+        "verbose": true,
+        "template": "./node_modules/clean-jsdoc-theme",
+        "theme_opts": {
+            "default_theme": "dark",
+            "menu": [ 
+                {
+                    "title": "Home",
+                    "link": "./index.html"
+                },
+                {
+                    "title": "Github",
+                    "link": "https://github.com/dm-yeu/empolis-basics"
+                }
+            ]
+        }
+    },
+    "markdown": {
+        "hardwrap": false,
+        "idInHeadings": true
+    }
+}

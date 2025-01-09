@@ -1,0 +1,41 @@
+# config.yaml
+
+# Base URL for Empolis APIs
+BASE_URL: 'https://yaskawa2.esc-eu-central-1.empolisservices.com'
+
+# API scope
+API_SCOPE: 'device_yeuMendt'
+
+# Empolis INGEST API Version to Use
+INGEST_API_VERSION: '2.1'
+
+# Empolis IAS API Version to Use
+IAS_API_VERSION: '4.5'
+
+# Empolis STORE API Version to Use
+STORE_API_VERSION: '3.0'
+
+# iCube Help Files Directory
+## Empolis Box
+##ICUBE_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Motion Controller/iCube Engineer'
+## Local for Test
+ICUBE_HELP_DIR: 'C:/temp/test/icube'
+# iCube Help Files Storage Location in Empolis
+ICUBE_DATA_SOURCE: 'environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer'
+
+# DWEZ Help Files Directory
+## Empolis Box
+##DWEZ_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Drives/DriveWorks EZ'
+## Local for Test
+DWEZ_HELP_DIR: 'C:/temp/test/dwez'
+# DWEZ Help Files Storage Location in Empolis
+DWEZ_DATA_SOURCE: 'environment/project1_p/documents/1731422888439/D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ'
+
+# Log Directory
+## Empolis Box
+##LOG_DIRECTORY: 'F:/Empolis-DataSource/_logs'
+## Local for Test
+LOG_DIRECTORY: 'C:/temp/test/logs'
+
+# Log Level
+LOG_LEVEL: 'info'
