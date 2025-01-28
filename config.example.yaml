@@ -20,6 +20,7 @@ STORE_API_VERSION: '3.0'
 ##ICUBE_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Motion Controller/iCube Engineer'
 ## Local for Test
 ICUBE_HELP_DIR: 'C:/temp/test/icube'
+
 # iCube Help Files Storage Location in Empolis
 ICUBE_DATA_SOURCE: 'environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer'
 
@@ -28,6 +29,7 @@ ICUBE_DATA_SOURCE: 'environment/project1_p/documents/1719926565798/D%3A/Empolis-
 ##DWEZ_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Drives/DriveWorks EZ'
 ## Local for Test
 DWEZ_HELP_DIR: 'C:/temp/test/dwez'
+
 # DWEZ Help Files Storage Location in Empolis
 DWEZ_DATA_SOURCE: 'environment/project1_p/documents/1731422888439/D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ'
 
