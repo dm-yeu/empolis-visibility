@@ -31,14 +31,14 @@ async function initializeLogger() {
     }
 
     const errorRotateTransport = new winston.transports.DailyRotateFile({
-      filename: path.join(config.LOG_DIRECTORY, 'empolis-helpfile-metadata_%DATE%_error.log'),
+      filename: path.join(config.LOG_DIRECTORY, 'empolis-visibility_%DATE%_error.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: '7d',
       level: 'error'
     });
 
     const combinedRotateTransport = new winston.transports.DailyRotateFile({
-      filename: path.join(config.LOG_DIRECTORY, 'empolis-helpfile-metadata_%DATE%_combined.log'),
+      filename: path.join(config.LOG_DIRECTORY, 'empolis-visibility_%DATE%_combined.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: '7d'
     });
