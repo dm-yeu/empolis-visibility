@@ -38,8 +38,8 @@ logger.debug(`config:\n${config}`);
 async function main() {
 
   const startTime = performance.now();
-  logger.info(`Run of empolis-basics main() started`);
-  console.log(`Run of empolis-basics main() started, logs can be found in ${logger.transports[0].dirname}`);
+  logger.info(`Run of empolis-visibility main() started`);
+  console.log(`Run of empolis-visibility main() started, logs can be found in ${logger.transports[0].dirname}`);
 
   try {
     
@@ -57,6 +57,7 @@ async function main() {
     const icubeIndexFile = await createFileIndex(config.ICUBE_HELP_DIR, icubeFiles);
     const dwezIndexFile = await createFileIndex(config.DWEZ_HELP_DIR, dwezFiles);
 
+    // Update the metadata of each file in the index (iCube)
     const icubeIndex = await readJsonData(icubeIndexFile);
     for (const file of icubeFiles) {
       const index = icubeIndex.findIndex(obj => obj.filename === file);
@@ -64,6 +65,7 @@ async function main() {
       await processFile(API_TOKEN, config.ICUBE_DATA_SOURCE, fileData)
     }
 
+    // Update the metadata of each file in the index (DWEZ)
     const dwezIndex = await readJsonData(dwezIndexFile);
     for (const file of dwezFiles) {
       const index = dwezIndex.findIndex(obj => obj.filename === file);
@@ -85,7 +87,7 @@ async function main() {
 
 
 /**
- * Function to modify the Title metadata of a file via the Empolis INGEST API
+ * Function to modify the metadata of a file via the Empolis INGEST API
  * <br> Only modifies metadata with editFileMetadata() if it does not have the correct value already
  * @async
  * @function processFile
@@ -158,5 +160,8 @@ async function processFile(authToken, dataSource, dataObject) {
 }
 
 
-main ();
-  
+//main ();
+// Check if the current module is the main module before calling main()
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}
