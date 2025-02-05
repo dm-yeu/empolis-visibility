@@ -75,19 +75,13 @@ export default logger;
  * @param {object} response the response from a got() request
  */
 export function logResponse(response, logEntryTitle = 'got() response') {
-  const formattedBody = util.inspect(JSON.parse(response.body), {
-    depth: null,
-    colors: false,
-    maxArrayLength: null,
-    maxStringLength: null,
-    compact: false,
-    breakLength: 80
-  });
+
+  const formattedBody = JSON.stringify(JSON.parse(response.body), null, 2);
 
   logger.debug(`${logEntryTitle}:
     statusCode: ${response.statusCode}
     body:
-    ${formattedBody.split('\n').map(line => '    ' + line).join('\n')}` // add indentation to response.body
+    ${formattedBody.split('\n').map(line => '  ' + line).join('\n')}` // add indentation to response.body
   );
 }
 
