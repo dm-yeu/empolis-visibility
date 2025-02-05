@@ -1,0 +1,17 @@
+statusCode: 200
+body:
+{
+  "count": 1,
+  "numberOfTotalDocuments": 4025,
+  "numberOfTotalRecords": 8016,
+  "records": [
+  {
+    "DownloadLink": "environment/project1_p/documents/1731422888439/D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ/0001973746.html",
+    "FileName": "0001973746.html",
+    "Title": "WCOL8: Write Comm. Logic Register 8",
+    "_id": "OTZmMThhOTQtM2NhNi00NmQ3LTg3NjktNWM4ODkxMjZmYTZkFwAAAA",
+    "_recordid": "environment/project1_p/documents/1731422888439/D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ/0001973746.html",
+    "_score": 0.9795
+  }
+  ]
+}
