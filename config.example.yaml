@@ -8,12 +8,12 @@ API_SCOPE: 'device_yeuMendt'
 
 # Empolis INGEST API Version to Use
 INGEST_API_VERSION: '2.1'
-
 # Empolis IAS API Version to Use
 IAS_API_VERSION: '4.5'
-
 # Empolis STORE API Version to Use
 STORE_API_VERSION: '3.0'
+# Empolis Expert Knowledge API Version to Use
+SERVICE-KNOWLEDGE_API_VERSION: '1.0'
 
 # iCube Help Files Directory
 ## Empolis Box
