@@ -25,9 +25,9 @@ export async function checkApiStatus(authToken) {
   logger.debug(`checkApiStatus() started`)
 
   const apiChecks = [
-    apiOperational(authToken, 'ingest', config.INGEST_API_VERSION),
-    apiOperational(authToken, 'ias', config.IAS_API_VERSION),
-    apiOperational(authToken, 'store', config.STORE_API_VERSION)
+    apiOperational({ authToken, apiName: 'ingest', apiVersion: config.INGEST_API_VERSION }),
+    apiOperational({ authToken, apiName: 'ias', apiVersion: config.IAS_API_VERSION }),
+    apiOperational({ authToken, apiName: 'store', apiVersion: config.STORE_API_VERSION })
   ];
 
   const results = await Promise.all(apiChecks);
@@ -111,7 +111,7 @@ export async function getToken() {
  * @requires got
  */
 
-export async function apiOperational (authToken, apiName, apiVersion) {
+export async function apiOperational ({ authToken, apiName, apiVersion }) {
 
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
   
@@ -138,4 +138,3 @@ export async function apiOperational (authToken, apiName, apiVersion) {
     logger.error(`apiOperational() Error:\n${error}`);
   }
 }
-  
