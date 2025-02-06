@@ -2,9 +2,9 @@ import fs from 'fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 import logger from './logger.js';
-import { fileExists, truncateFile } from './helpers.js'
+import { fileExists, truncateFile } from './helpers.js';
 
-/** 
+/**
  * Namespace for functions used to extract text from HTML files and create a file index
  * @namespace fileIndex
  */
@@ -24,38 +24,36 @@ import { fileExists, truncateFile } from './helpers.js'
  * @requires logger
  */
 
-export async function createFileIndex ({ directoryPath, fileList }) {
+export async function createFileIndex({ directoryPath, fileList }) {
+  logger.debug(`directoryPath: ${directoryPath}`);
 
-    logger.debug(`directoryPath: ${directoryPath}`);
-    
-    try {
-        // Prepare index directory and file
-        const indexDir = path.join(directoryPath, 'index');
-        logger.debug(`indexDir: ${indexDir}`);
-        const indexFile = path.join(indexDir, 'file_index.json')
-        logger.debug(`indexFile: ${indexFile}`);
+  try {
+    // Prepare index directory and file
+    const indexDir = path.join(directoryPath, 'index');
+    logger.debug(`indexDir: ${indexDir}`);
+    const indexFile = path.join(indexDir, 'file_index.json');
+    logger.debug(`indexFile: ${indexFile}`);
 
-        // If the index directory does not exist, create it
-        if (!(await fileExists(indexDir))) {
-            await fs.mkdir(indexDir, {recursive: true});
-            logger.info(`${indexDir} directory created for file index.`)
-        }
-        // If the index directory and the index file exist, empty the index file
-        else if ((await fileExists(indexFile))) {
-            await truncateFile(indexFile);
-        }
-
-        for (const file of fileList) {
-            const filePath = path.join(directoryPath, file);
-            const titleAndBreadcrumbs = await extractTitleAndBreadcrumbs(filePath);
-            await writeIndexFile({ newEntry: titleAndBreadcrumbs, indexFilePath: indexFile });
-        }
-
-        return indexFile;
+    // If the index directory does not exist, create it
+    if (!(await fileExists(indexDir))) {
+      await fs.mkdir(indexDir, { recursive: true });
+      logger.info(`${indexDir} directory created for file index.`);
     }
-    catch (error) {
-        logger.error(`createFileIndex() Error:\n${error}`);
+    // If the index directory and the index file exist, empty the index file
+    else if (await fileExists(indexFile)) {
+      await truncateFile(indexFile);
     }
+
+    for (const file of fileList) {
+      const filePath = path.join(directoryPath, file);
+      const titleAndBreadcrumbs = await extractTitleAndBreadcrumbs(filePath);
+      await writeIndexFile({ newEntry: titleAndBreadcrumbs, indexFilePath: indexFile });
+    }
+
+    return indexFile;
+  } catch (error) {
+    logger.error(`createFileIndex() Error:\n${error}`);
+  }
 }
 
 /** Extract title and breadcrumbs from HTML file content, and return as object with the filename
@@ -70,8 +68,7 @@ export async function createFileIndex ({ directoryPath, fileList }) {
  * @requires logger
  */
 
-export async function extractTitleAndBreadcrumbs (htmlFilePath) {
-
+export async function extractTitleAndBreadcrumbs(htmlFilePath) {
   try {
     const filename = path.basename(htmlFilePath);
     const htmlContent = await fs.readFile(htmlFilePath, 'utf8');
@@ -80,22 +77,21 @@ export async function extractTitleAndBreadcrumbs (htmlFilePath) {
     // Try to get title from <title> tag first, then fall back to Heading_2
     let title = $('title').text().trim();
     if (!title) title = $('.Heading_2').text().trim();
-    if (!title) title = "Untitled";
-    
+    if (!title) title = 'Untitled';
+
     const breadcrumbs = $('.WebWorks_Breadcrumbs')
-        .text()
-        .trim()
-        .split('>')
-        .map(crumb => crumb.trim());
+      .text()
+      .trim()
+      .split('>')
+      .map((crumb) => crumb.trim());
 
     logger.info(`  Title ('${title}') and breadcrumbs extracted from '${filename}' and returned`);
     return {
-        filename,
-        title,
-        ...(breadcrumbs.length > 0 && breadcrumbs[0].trim() !== '' && { breadcrumbs })
+      filename,
+      title,
+      ...(breadcrumbs.length > 0 && breadcrumbs[0].trim() !== '' && { breadcrumbs }),
     };
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(`extractTitleAndBreadcrumbs() Error:\n${error}`);
   }
 }
@@ -112,21 +108,20 @@ export async function extractTitleAndBreadcrumbs (htmlFilePath) {
  * @requires logger
  */
 
-async function writeIndexFile ({ newEntry, indexFilePath }) {
+async function writeIndexFile({ newEntry, indexFilePath }) {
+  try {
+    let jsonIndex = [];
     try {
-      let jsonIndex = [];
-      try {
-        jsonIndex = JSON.parse(await fs.readFile(indexFilePath, 'utf8'));
-      } catch (error) {
-        // If file doesn't exist or is invalid JSON, start with an empty index
-        logger.info(`  ${indexFilePath} not found. Starting with empty index.`)
-      }
-      jsonIndex.push(newEntry);
-      await fs.writeFile(indexFilePath, JSON.stringify(jsonIndex, null, 2));
-      logger.info(`  ${JSON.stringify(newEntry)} added to index file.`);
-      return null;
+      jsonIndex = JSON.parse(await fs.readFile(indexFilePath, 'utf8'));
+    } catch {
+      // If file doesn't exist or is invalid JSON, start with an empty index
+      logger.info(`  ${indexFilePath} not found. Starting with empty index.`);
     }
-    catch (error) {
-      logger.error(`  Error writing to ${indexFilePath}:\n`, error);
-    }
+    jsonIndex.push(newEntry);
+    await fs.writeFile(indexFilePath, JSON.stringify(jsonIndex, null, 2));
+    logger.info(`  ${JSON.stringify(newEntry)} added to index file.`);
+    return null;
+  } catch (error) {
+    logger.error(`  Error writing to ${indexFilePath}:\n`, error);
   }
+}

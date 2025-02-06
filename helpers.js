@@ -42,7 +42,6 @@ export async function loadConfig() {
   }
 }
 
-
 /**
  * Function to get all the filenames with .html or .htm ending from a specified directory.
  * @async
@@ -55,7 +54,10 @@ export async function loadConfig() {
 export async function getHtmlFiles(directory) {
   try {
     let files = await fs.readdir(directory);
-    files = files.filter(file => path.extname(file).toLowerCase() === '.html' || path.extname(file).toLowerCase() === '.htm');
+    files = files.filter(
+      (file) =>
+        path.extname(file).toLowerCase() === '.html' || path.extname(file).toLowerCase() === '.htm'
+    );
     if (files.length === 0) throw new Error(`No HTML files found in ${directory}`);
     return files;
   } catch (error) {
@@ -103,7 +105,6 @@ export async function truncateFile(filePath) {
     logger.error(`Error truncating ${filePath}:\n`, err);
   }
 }
-
 
 export async function readJsonData(filePath) {
   try {

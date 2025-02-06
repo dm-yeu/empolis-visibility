@@ -20,7 +20,7 @@ Documented via jsdoc (see HTML in `./jsdoc`).
 
 ### Empolis API
 
-Authentication with the Empolis API is handled via the [*Resource Owner Password Credentials Grant*](https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant) method.
+Authentication with the Empolis API is handled via the [_Resource Owner Password Credentials Grant_](https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant) method.
 
 ## Backlog
 

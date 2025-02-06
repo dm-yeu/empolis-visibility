@@ -1,5 +1,5 @@
 // Imports
-import got, { HTTPError } from 'got';
+import got from 'got';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
 import { config } from './index.js';
@@ -9,25 +9,23 @@ import { config } from './index.js';
  * @namespace empolisAdmin
  */
 
-
 /**
  * Function to check status of all Empolis API services
  * @async
  * @function checkApiStatus
  * @memberof empolisAdmin
- * @param {string} authToken - authentication token for API requests 
+ * @param {string} authToken - authentication token for API requests
  * @requires ./empolis_functions.js
  * @returns error if an API is not operational
  */
 
 export async function checkApiStatus(authToken) {
-
-  logger.debug(`checkApiStatus() started`)
+  logger.debug(`checkApiStatus() started`);
 
   const apiChecks = [
     apiOperational({ authToken, apiName: 'ingest', apiVersion: config.INGEST_API_VERSION }),
     apiOperational({ authToken, apiName: 'ias', apiVersion: config.IAS_API_VERSION }),
-    apiOperational({ authToken, apiName: 'store', apiVersion: config.STORE_API_VERSION })
+    apiOperational({ authToken, apiName: 'store', apiVersion: config.STORE_API_VERSION }),
   ];
 
   const results = await Promise.all(apiChecks);
@@ -41,11 +39,10 @@ export async function checkApiStatus(authToken) {
 
   logger.info('All Empolis services are operational');
 }
-  
 
- /**
- * Function to retrieve the authentication token used with the Empolis API. Authentication with the Empolis API is handled via the 
- * [Resource Owner Password Credentials Grant]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant} 
+/**
+ * Function to retrieve the authentication token used with the Empolis API. Authentication with the Empolis API is handled via the
+ * [Resource Owner Password Credentials Grant]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant}
  * method.
  * <br>Credentials are stored in the .env file (.gitignore) in project root.
  * @async
@@ -57,7 +54,6 @@ export async function checkApiStatus(authToken) {
  */
 
 export async function getToken() {
-
   logger.debug(`getToken() started`);
 
   const url = `${config.BASE_URL}/oauth2/token`;
@@ -71,7 +67,7 @@ export async function getToken() {
 
   // Define POST request body
   const data = `grant_type=password&username=${API_USERNAME}&password=${API_PASSWORD}&scope=${config.API_SCOPE}`;
-  
+
   // Define got() request options
   const options = {
     url,
@@ -79,26 +75,23 @@ export async function getToken() {
     username: CLIENT_ID,
     password: CLIENT_SECRET,
     headers: {
-      'content-type' : 'application/x-www-form-urlencoded'
+      'content-type': 'application/x-www-form-urlencoded',
     },
     body: data,
   };
 
   try {
-
     // Make token request to Empolis API
     const response = await got(options);
     logResponse(response, 'getToken() got response');
 
     // Return the access token
     return JSON.parse(response.body).access_token;
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(`getToken() Error:\n${error}`);
   }
 }
-  
-  
+
 /**
  * Function to retrieve the status of a specified Empolis API.
  * @async
@@ -111,29 +104,27 @@ export async function getToken() {
  * @requires got
  */
 
-export async function apiOperational ({ authToken, apiName, apiVersion }) {
-
+export async function apiOperational({ authToken, apiName, apiVersion }) {
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
-  
-  const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`
+
+  const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`;
 
   // Define got() request options
   const options = {
     url,
     method: 'GET',
     headers: {
-      'Authorization' : `Bearer ${authToken}`
+      Authorization: `Bearer ${authToken}`,
     },
-  }
+  };
 
   try {
     const response = await got(options);
-    logResponse(response, 'apiOperational() got response');    
+    logResponse(response, 'apiOperational() got response');
 
     // Return the status (opearational true/false) of the specified Empolis Ingest API version
     return JSON.parse(response.body).operational;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(`apiOperational() Error:\n${error}`);
     logger.error(`apiOperational() Error:\n${error}`);
   }

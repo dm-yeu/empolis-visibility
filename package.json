@@ -1,7 +1,9 @@
 {
   "main": "index.js",
   "scripts": {
-    "generate-docs": "jsdoc -c ./jsdoc/jsdoc.json -r -R README.md package.json index.js empolis_admin.js empolis_ops.js empolis_search.js helpers.js logger.js index_creation.js -d ./jsdoc --verbose"
+    "generate-docs": "jsdoc -c ./jsdoc/jsdoc.json -r -R README.md package.json index.js empolis_admin.js empolis_ops.js empolis_search.js helpers.js logger.js index_creation.js -d ./jsdoc --verbose",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "cheerio": "^1.0.0",
@@ -17,7 +19,13 @@
   },
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^9.19.0",
     "docdash": "^2.0.2",
-    "jsdoc": "^4.0.3"
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.14.0",
+    "jsdoc": "^4.0.3",
+    "prettier": "^3.4.2"
   }
 }
