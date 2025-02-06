@@ -24,7 +24,7 @@ const FILE_PATH_ERROR = 'Metadata must contain \'FilePath\'';
  * @requires got
  */
 
-export async function getFileMetadata (authToken, path) {
+export async function getFileMetadata ({ authToken, path }) {
 
   logger.debug(`getFileMetadata() started`);
 
@@ -62,12 +62,12 @@ export async function getFileMetadata (authToken, path) {
  * @function editFileMetadata
  * @memberof empolisOps
  * @param {string} authToken - authentication token for API requests
- * @param {string} newTitle - new Title attribute value for the specified file
+ * @param {object} newMetadata - new metadata for the specified file
  * @returns {Promise<JSON>} API request response body
  * @requires got
  */
 
-export async function editFileMetadata (authToken, newMetadata) {
+export async function editFileMetadata ({ authToken, newMetadata }) {
 
   logger.debug(`editFileMetadata() started`);
   
@@ -124,7 +124,7 @@ export async function editFileMetadata (authToken, newMetadata) {
  * @requires got
  */
 
-export async function getRecord (authToken, recordId) {
+export async function getRecord ({ authToken, recordId }) {
 
   logger.debug(`getRecord() started`);
 
@@ -174,7 +174,7 @@ export async function getRecord (authToken, recordId) {
  * 
  */
 
-export async function updateRecord (authToken, recordId, updatedRecord) {
+export async function updateRecord ({ authToken, recordId, updatedRecord }) {
 
   logger.debug(`updateRecord() started`);
 

@@ -115,7 +115,7 @@ async function processFile(authToken, dataSource, dataObject) {
   const downloadLink = firstResult.DownloadLink;
 
   // Get the metadata of the file with the specified 'DownloadLink'
-  const fileMetadata = await getFileMetadata(authToken, downloadLink);
+  const fileMetadata = await getFileMetadata({ authToken, path: downloadLink });
   
   let newKeywords = "";
   if (dataObject.breadcrumbs) {
@@ -151,7 +151,7 @@ async function processFile(authToken, dataSource, dataObject) {
   }
   logPrettyJson(newMetadata, 'newMetadata');
 
-  const editMetadataResponse = await editFileMetadata (authToken, newMetadata);
+  const editMetadataResponse = await editFileMetadata({ authToken, newMetadata });
   if ( editMetadataResponse === 202 ) {
     logger.info(`${dataObject.filename} metadata modified successfully`);
   } else {
