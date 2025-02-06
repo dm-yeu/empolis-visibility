@@ -23,7 +23,7 @@ import { config } from './index.js';
  * @requires got
  */
 
-export async function nlqSearch (authToken, searchTerm, maxResults = 10) {
+export async function nlqSearch ({ authToken, searchTerm, maxResults = 10 }) {
   
   logger.debug(`nlqSearch() started`);
   
@@ -74,6 +74,7 @@ export async function nlqSearch (authToken, searchTerm, maxResults = 10) {
  * @function vfqSearch
  * @memberof empolisSearch
  * @param {string} authToken - authentication token for API requests
+ * @param {string} source - Empolis data source to search against
  * @param {string} searchTerm - search term in natural language
  * @param {string} [ searchAttribute = "DownloadLink" ] - attribute to search, default is "DownloadLink"
  * @param {number} [ maxResults = 1 ] - maximum number of search results, default is 1
@@ -81,7 +82,7 @@ export async function nlqSearch (authToken, searchTerm, maxResults = 10) {
  * @requires got
  */
 
-export async function vfqSearch (authToken, source, searchTerm, searchAttribute = "DownloadLink", maxResults = 1) {
+export async function vfqSearch ({ authToken, source, searchTerm, searchAttribute = "DownloadLink", maxResults = 1 }) {
 
   logger.debug(`vfqSearch() started`);
   

@@ -105,7 +105,7 @@ async function processFile(authToken, dataSource, dataObject) {
   logger.debug(`dataObject: ${JSON.stringify(dataObject)}`);
 
   // Search for html file in the Empolis index to get the 'DownloadLink' attribute
-  const searchResults = await vfqSearch(authToken, dataSource, dataObject.filename);
+  const searchResults = await vfqSearch({ authToken, source: dataSource, searchTerm: dataObject.filename });
   if (!searchResults?.records?.length) {
     logger.warn(`No search results for the term \'${dataObject.filename}\' found in the index`)
     return;
