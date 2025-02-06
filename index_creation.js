@@ -24,7 +24,7 @@ import { fileExists, truncateFile } from './helpers.js'
  * @requires logger
  */
 
-export async function createFileIndex (directoryPath, fileList) {
+export async function createFileIndex ({ directoryPath, fileList }) {
 
     logger.debug(`directoryPath: ${directoryPath}`);
     
@@ -48,7 +48,7 @@ export async function createFileIndex (directoryPath, fileList) {
         for (const file of fileList) {
             const filePath = path.join(directoryPath, file);
             const titleAndBreadcrumbs = await extractTitleAndBreadcrumbs(filePath);
-            await writeIndexFile(titleAndBreadcrumbs, indexFile);
+            await writeIndexFile({ newEntry: titleAndBreadcrumbs, indexFilePath: indexFile });
         }
 
         return indexFile;
@@ -105,13 +105,14 @@ export async function extractTitleAndBreadcrumbs (htmlFilePath) {
  * @function writeIndexFile
  * @memberof fileIndex
  * @param {Object} newEntry - New entry for the file index
+ * @param {string} indexFilePath - Path of the index file
  * @returns {Promise<null>}
  * @requires fs.readFile
  * @requires fs.writeFile
  * @requires logger
  */
 
-async function writeIndexFile (newEntry, indexFilePath) {
+async function writeIndexFile ({ newEntry, indexFilePath }) {
     try {
       let jsonIndex = [];
       try {

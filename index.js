@@ -54,8 +54,8 @@ async function main() {
     const dwezFiles = await getHtmlFiles(config.DWEZ_HELP_DIR);
 
     // Create index of all HTML files in the specified directories
-    const icubeIndexFile = await createFileIndex(config.ICUBE_HELP_DIR, icubeFiles);
-    const dwezIndexFile = await createFileIndex(config.DWEZ_HELP_DIR, dwezFiles);
+    const icubeIndexFile = await createFileIndex({ directoryPath: config.ICUBE_HELP_DIR, fileList: icubeFiles });
+    const dwezIndexFile = await createFileIndex({ directoryPath: config.DWEZ_HELP_DIR, fileList: dwezFiles });
 
     // Update the metadata of each file in the index (iCube)
     const icubeIndex = await readJsonData(icubeIndexFile);
