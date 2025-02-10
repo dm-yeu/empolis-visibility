@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import logger, { logPrettyJson } from './logger.js';
+import { select } from '@inquirer/prompts';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -42,6 +43,25 @@ async function main() {
   );
 
   try {
+
+    const selectDataSource = await select({
+      message: 'Select the data source:',
+      choices: [
+        { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
+        { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
+      ],
+    });
+    console.log(`Selected data source: ${selectDataSource}`);
+
+    const selectAction = await select({
+      message: 'Select the operation to perform on the data source:',
+      choices: [
+        { name: 'Create index', value: 'index', description: 'Create an index of all files in the data source with associated metadata' },
+        { name: 'Update metadata', value: 'update', description: 'Update the metadata for all files in the data source' },
+      ],
+    });
+    console.log(`Selected action: ${selectAction}`);
+
     // Get API token for authentication
     const API_TOKEN = await getToken();
 
