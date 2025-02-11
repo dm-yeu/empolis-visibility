@@ -46,55 +46,16 @@ async function main() {
     let indexFile = '';
     // Create index file for the data source if user selects 'index' or 'update' operation
     if (config.OPERATION === 'index' || config.OPERATION === 'update') {
-      // Prompt user to confirm the directory for the source files of the data source
-      config.OK = await confirm({
-        message: `The directory for the files of data source '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
-      });
-
-      // Exit if user cancels the operation due to incorrect configuration
-      if (!config.OK) {
-        logger.info(`User cancelled the operation due to configuration errors`);
-        console.log(
-          `${chalk.red('X')}` +
-            ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
-        );
-        return;
-      }
-
-      fileList = await getHtmlFiles(config.FILE_DIR);
-      console.log(
-        `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
-      );
-      indexFile = await createFileIndex({
-        directoryPath: config.FILE_DIR,
-        fileList,
-      });
-      console.log(
-        `${chalk.green('√')}` +
-          ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
-      );
+      ({ fileList, indexFile } = await createUpdateIndexFile());
     }
     // Update metadata for each file in the index if user selects 'update' operation
     if (config.OPERATION === 'update') {
-      const API_TOKEN = await getToken();
-      await checkApiStatus(API_TOKEN, startTime);
-      // Load the full index of files from the index file
-      const index = await readJsonData(indexFile);
-      // Update the metadata for each file in the index
-      for (const file of fileList) {
-        const fileIndex = index.findIndex((obj) => obj.filename === file);
-        const fileData = index[fileIndex];
-        await processFile(API_TOKEN, config.DATA_SOURCE, fileData);
-      }
-      console.log(
-        `${chalk.green('√')}` +
-          ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
-      );
+      await updateCloudMetadata({ fileList, indexFile });
     }
 
-    if (config.OPERATION === 'search') {
+    if (config.OPERATION === 'file_search') {
       const API_TOKEN = await getToken();
-      await checkApiStatus(API_TOKEN, startTime);
+      await checkApiStatus(API_TOKEN);
       const searchTerm = await input({ message: 'Enter the filename to search for:' });
       const searchResults = await vfqSearch({
         authToken: API_TOKEN,
@@ -133,6 +94,91 @@ async function main() {
         ` Logs can be found in ${chalk.cyan(logger.transports[0].dirname)}.`
     );
   }
+}
+
+/**
+ * Create or update an index file with all source files contained in the original data source
+ * @async
+ * @function createUpdateIndexFile
+ * @memberof fileIndex
+ * @requires confirm
+ * @requires helpers
+ * @requires index_creation
+ * @returns {Promise<Object>} Object containing the list of files as an array, and the index file path
+ */
+async function createUpdateIndexFile() {
+
+  try {
+    // Prompt user to confirm the directory for the source files of the data source
+    config.OK = await confirm({
+      message: `The directory for the files of data source '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
+    });
+
+    // Throw error if user cancels the operation due to incorrect configuration
+    if (!config.OK) {
+      logger.info(`User cancelled the operation due to configuration errors`);
+      console.log(
+        `${chalk.red('X')}` +
+          ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
+      );
+      throw new Error('Operation cancelled');
+    }
+
+    const fileList = await getHtmlFiles(config.FILE_DIR);
+    console.log(
+      `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
+    );
+    logger.info(`Found ${fileList.length} HTML files in data source directory. Creating index file.`);
+    const indexFile = await createFileIndex({
+      directoryPath: config.FILE_DIR,
+      fileList,
+    });
+    console.log(
+      `${chalk.green('√')}` +
+        ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
+    );
+    logger.info(`Index file for '${config.dataSourceSelection}' source data created at ${indexFile}`);
+    return { fileList, indexFile };
+  } catch (error) {
+    if (error.message === 'Operation cancelled') {
+      return { fileList: [], indexFile: '' };
+    }
+    else {
+      logger.error(`createUpdateIndexFile() Error:\n${error}`);
+      throw new Error(`Failed to create index file: ${error.message}`);
+    }
+  }
+}
+
+/**
+ * Update the metadata of files in the Empolis cloud with information from the index file
+ * @async
+ * @function updateCloudMetadata
+ * @memberof empolis_ops
+ * @param {Array} fileList - list of filenames to update metadata for
+ * @param {string} indexFile - path of the index file containing metadata
+ * @requires empolis_admin
+ * @returns {Promise<null>} null
+ */
+async function updateCloudMetadata({ fileList, indexFile }) {
+  const API_TOKEN = await getToken();
+  await checkApiStatus(API_TOKEN);
+  // Load the full index of files from the index file
+  const index = await readJsonData(indexFile);
+  // Update the metadata for each file in the index
+  console.log(`  Updating the metadata of ${chalk.cyan(fileList.length)} files...`);
+  logger.info(`Updating the metadata of ${fileList.length} files...`);
+  for (const file of fileList) {
+    const fileIndex = index.findIndex((obj) => obj.filename === file);
+    const fileData = index[fileIndex];
+    await processFile(API_TOKEN, config.DATA_SOURCE, fileData);
+  }
+  console.log(
+    `${chalk.green('√')}` +
+      ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
+  logger.info(`Completed metadata update operation for '${config.dataSourceSelection}' data source`);
+  return null;
 }
 
 /**
