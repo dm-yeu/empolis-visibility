@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import logger, { logPrettyJson } from './logger.js';
-import { select } from '@inquirer/prompts';
+import chalk from 'chalk';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: __dirname + `/.env` });
 
 // Load configuration
-export const config = await loadConfig();
+export const config = await loadConfig( { promptUser: true } );
 logger.debug(`config:\n${config}`);
 
 /**
@@ -36,67 +36,47 @@ logger.debug(`config:\n${config}`);
  */
 
 async function main() {
+
   const startTime = performance.now();
   logger.info(`Run of empolis-visibility main() started`);
-  console.log(
-    `Run of empolis-visibility main() started, logs can be found in ${logger.transports[0].dirname}`
-  );
+
+  // Exit if user cancels the operation due to incorrect configuration
+  if (!config.OK) {
+    logger.info(`User cancelled the operation due to configuration errors`);
+    console.log(`Operation cancelled. Check configuration in ${chalk.blue('./config.yaml')}`);
+    return;
+  };
 
   try {
 
-    const selectDataSource = await select({
-      message: 'Select the data source:',
-      choices: [
-        { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
-        { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
-      ],
-    });
-    console.log(`Selected data source: ${selectDataSource}`);
-
-    const selectAction = await select({
-      message: 'Select the operation to perform on the data source:',
-      choices: [
-        { name: 'Create index', value: 'index', description: 'Create an index of all files in the data source with associated metadata' },
-        { name: 'Update metadata', value: 'update', description: 'Update the metadata for all files in the data source' },
-      ],
-    });
-    console.log(`Selected action: ${selectAction}`);
-
-    // Get API token for authentication
-    const API_TOKEN = await getToken();
-
-    // Check status of APIs
-    await checkApiStatus(API_TOKEN, startTime);
-
-    // Get html filenames from specified directores
-    const icubeFiles = await getHtmlFiles(config.ICUBE_HELP_DIR);
-    const dwezFiles = await getHtmlFiles(config.DWEZ_HELP_DIR);
-
-    // Create index of all HTML files in the specified directories
-    const icubeIndexFile = await createFileIndex({
-      directoryPath: config.ICUBE_HELP_DIR,
-      fileList: icubeFiles,
-    });
-    const dwezIndexFile = await createFileIndex({
-      directoryPath: config.DWEZ_HELP_DIR,
-      fileList: dwezFiles,
-    });
-
-    // Update the metadata of each file in the index (iCube)
-    const icubeIndex = await readJsonData(icubeIndexFile);
-    for (const file of icubeFiles) {
-      const index = icubeIndex.findIndex((obj) => obj.filename === file);
-      const fileData = icubeIndex[index];
-      await processFile(API_TOKEN, config.ICUBE_DATA_SOURCE, fileData);
+    let fileList = [];
+    let indexFile = "";
+    if (config.OPERATION === 'index' || config.OPERATION === 'update' ) {
+      fileList = await getHtmlFiles(config.FILE_DIR);
+      console.log(`Found ${chalk.blue(fileList.length)} HTML files in data source directory. Creating index file...`);
+      indexFile = await createFileIndex({
+        directoryPath: config.FILE_DIR,
+        fileList,
+      });
+      console.log(`${chalk.green('√')}` + ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.blue(indexFile)}`);
     }
 
-    // Update the metadata of each file in the index (DWEZ)
-    const dwezIndex = await readJsonData(dwezIndexFile);
-    for (const file of dwezFiles) {
-      const index = dwezIndex.findIndex((obj) => obj.filename === file);
-      const fileData = dwezIndex[index];
-      await processFile(API_TOKEN, config.DWEZ_DATA_SOURCE, fileData);
+    if (config.OPERATION === 'update') {
+      // Get API token for authentication
+      const API_TOKEN = await getToken();
+      // Check status of APIs
+      await checkApiStatus(API_TOKEN, startTime);
+      // Get the full index of files from the index file
+      const index = await readJsonData(indexFile);
+      // Update the metadata for each file in the index
+      for (const file of fileList) {
+        const fileIndex = index.findIndex((obj) => obj.filename === file);
+        const fileData = index[fileIndex];
+        await processFile(API_TOKEN, config.DATA_SOURCE, fileData);
+      }
+      console.log(`${chalk.green('√')}` + ` Completed metadata update operation for '${config.dataSourceSelection}' data source`);
     }
+
   } catch (error) {
     console.error(`main() Error:\n${error}`);
     logger.error(`main() Error:\n${error}`);
@@ -104,7 +84,8 @@ async function main() {
     const endTime = performance.now();
     const executionTime = (endTime - startTime) / 1000; // Convert ms to seconds
     logger.info(`Done. Execution time: ${executionTime.toFixed(2)} seconds`);
-    console.log(`Done. Execution time: ${executionTime.toFixed(2)} seconds`);
+    console.log(`Done. Execution time: ${chalk.blue(executionTime.toFixed(2))} seconds.` + '\n' + 
+      `Logs can be found in ${chalk.blue(logger.transports[0].dirname)}.`);
   }
 }
 
@@ -188,8 +169,9 @@ async function processFile(authToken, dataSource, dataObject) {
   }
 }
 
-//main ();
+main ();
+
 // Check if the current module is the main module before calling main()
-if (import.meta.url === `file://${process.argv[1]}`) {
+/*if (import.meta.url === `file://${process.argv[1]}`) {
   main();
-}
+}*/
