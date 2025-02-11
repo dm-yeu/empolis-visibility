@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import yaml from 'js-yaml';
-import { select, confirm } from '@inquirer/prompts';
+import { select } from '@inquirer/prompts';
 
 /**
  * Namespace for configuration elements
@@ -59,14 +59,6 @@ export async function loadConfig({ promptUser = false }) {
         config.FILE_DIR = config.DWEZ_HELP_DIR;
         break;
     }
-    // Prompt user to confirm the directory for the source files of the data source
-    config.OK = await confirm({
-      message:
-        `The directory for the files of data source` +
-        ` '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
-    });
-
-    if (!config.OK) return config;
 
     // Prompt user to select the operation to perform on the data source
     config.OPERATION = await select({
@@ -86,7 +78,7 @@ export async function loadConfig({ promptUser = false }) {
           name: 'Search the data source',
           value: 'search',
           description: 'Search the data source for a specific file',
-        }
+        },
       ],
     });
 
