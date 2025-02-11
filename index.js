@@ -10,6 +10,8 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import logger, { logPrettyJson } from './logger.js';
 import chalk from 'chalk';
+import { input } from '@inquirer/prompts';
+import util from 'util';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -42,13 +44,17 @@ async function main() {
   // Exit if user cancels the operation due to incorrect configuration
   if (!config.OK) {
     logger.info(`User cancelled the operation due to configuration errors`);
-    console.log(`Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}`);
+    console.log(
+      `${chalk.red('X')}` +
+      ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
+    );
     return;
   }
 
   try {
     let fileList = [];
     let indexFile = '';
+    // Create index file for the data source if user selects 'index' or 'update' operation
     if (config.OPERATION === 'index' || config.OPERATION === 'update') {
       fileList = await getHtmlFiles(config.FILE_DIR);
       console.log(
@@ -63,13 +69,11 @@ async function main() {
           ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
       );
     }
-
+    // Update metadata for each file in the index if user selects 'update' operation
     if (config.OPERATION === 'update') {
-      // Get API token for authentication
       const API_TOKEN = await getToken();
-      // Check status of APIs
       await checkApiStatus(API_TOKEN, startTime);
-      // Get the full index of files from the index file
+      // Load the full index of files from the index file
       const index = await readJsonData(indexFile);
       // Update the metadata for each file in the index
       for (const file of fileList) {
@@ -81,6 +85,35 @@ async function main() {
         `${chalk.green('√')}` +
           ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
       );
+    }
+
+    if (config.OPERATION === 'search') {
+      const API_TOKEN = await getToken();
+      await checkApiStatus(API_TOKEN, startTime);
+      const searchTerm = await input({ message: 'Enter the filename to search for:' });
+      const searchResults = await vfqSearch({
+        authToken: API_TOKEN,
+        source: config.DATA_SOURCE,
+        searchTerm,
+      });
+      if (searchResults?.records?.length) {
+        console.log(
+          `${chalk.green('√')}` +
+            ` Results for '${chalk.cyan(searchTerm)}' found in the '${config.dataSourceSelection}' data source.`
+        );
+        const firstResult = searchResults.records[0];
+        const downloadLink = firstResult.DownloadLink;
+        const fileMetadata = await getFileMetadata({ authToken: API_TOKEN, path: downloadLink });
+        console.log(`  Metadata for ${searchTerm}:` + `\n` +
+          `${util.inspect(fileMetadata, { depth: null, colors: true })}`
+        );
+
+      } else {
+        console.log(
+          `${chalk.red('X')}` +
+            ` No search results for '${chalk.cyan(searchTerm)}' found in the '${config.dataSourceSelection}' data source`
+        );
+      }
     }
   } catch (error) {
     console.error(`main() Error:\n${error}`);
@@ -113,7 +146,7 @@ async function processFile(authToken, dataSource, dataObject) {
   logger.info(`Processing ${dataObject.filename}`);
   logger.debug(`dataObject: ${JSON.stringify(dataObject)}`);
 
-  // Search for html file in the Empolis index to get the 'DownloadLink' attribute
+  // Search for file in the Empolis index to get the 'DownloadLink' attribute
   const searchResults = await vfqSearch({
     authToken,
     source: dataSource,
