@@ -75,8 +75,8 @@ export async function loadConfig({ promptUser = false }) {
           description: 'Update the index and metadata for all files in the data source',
         },
         {
-          name: 'Search the data source',
-          value: 'search',
+          name: 'Filename search',
+          value: 'file_search',
           description: 'Search the data source for a specific file',
         },
       ],
