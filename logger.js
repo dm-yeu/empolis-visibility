@@ -25,7 +25,7 @@ import { loadConfig } from './helpers.js';
  */
 async function initializeLogger() {
   try {
-    const config = await loadConfig( { promptUser: false } );
+    const config = await loadConfig({ promptUser: false });
     if (config.LOG_LEVEL === 'debug') {
       console.log(
         `initializeLogger() config:\n${util.inspect(config, { depth: null, colors: false })}`

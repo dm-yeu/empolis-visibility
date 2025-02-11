@@ -58,24 +58,34 @@ export async function loadConfig({ promptUser = false }) {
         config.DATA_SOURCE = config.DWEZ_DATA_SOURCE;
         config.FILE_DIR = config.DWEZ_HELP_DIR;
         break;
-    };
+    }
     // Prompt user to confirm the directory for the source files of the data source
-    config.OK = await confirm({ message: `The directory for the files of data source`+
-      ` '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?` });
+    config.OK = await confirm({
+      message:
+        `The directory for the files of data source` +
+        ` '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
+    });
 
     if (!config.OK) return config;
-    
+
     // Prompt user to select the operation to perform on the data source
     config.OPERATION = await select({
       message: 'Select the operation to perform on the data source:',
       choices: [
-        { name: 'Create index file', value: 'index', description: 'Create an index of all files in the data source with associated metadata' },
-        { name: 'Update index file and metadata', value: 'update', description: 'Update the index and metadata for all files in the data source' },
+        {
+          name: 'Create index file',
+          value: 'index',
+          description: 'Create an index of all files in the data source with associated metadata',
+        },
+        {
+          name: 'Update index file and metadata',
+          value: 'update',
+          description: 'Update the index and metadata for all files in the data source',
+        },
       ],
     });
-    
-    return config;
 
+    return config;
   } catch (error) {
     console.error(`loadconfig() Error:\n${error}`);
     throw error;

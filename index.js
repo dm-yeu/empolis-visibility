@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: __dirname + `/.env` });
 
 // Load configuration
-export const config = await loadConfig( { promptUser: true } );
+export const config = await loadConfig({ promptUser: true });
 logger.debug(`config:\n${config}`);
 
 /**
@@ -36,29 +36,32 @@ logger.debug(`config:\n${config}`);
  */
 
 async function main() {
-
   const startTime = performance.now();
   logger.info(`Run of empolis-visibility main() started`);
 
   // Exit if user cancels the operation due to incorrect configuration
   if (!config.OK) {
     logger.info(`User cancelled the operation due to configuration errors`);
-    console.log(`Operation cancelled. Check configuration in ${chalk.blue('./config.yaml')}`);
+    console.log(`Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}`);
     return;
-  };
+  }
 
   try {
-
     let fileList = [];
-    let indexFile = "";
-    if (config.OPERATION === 'index' || config.OPERATION === 'update' ) {
+    let indexFile = '';
+    if (config.OPERATION === 'index' || config.OPERATION === 'update') {
       fileList = await getHtmlFiles(config.FILE_DIR);
-      console.log(`Found ${chalk.blue(fileList.length)} HTML files in data source directory. Creating index file...`);
+      console.log(
+        `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
+      );
       indexFile = await createFileIndex({
         directoryPath: config.FILE_DIR,
         fileList,
       });
-      console.log(`${chalk.green('√')}` + ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.blue(indexFile)}`);
+      console.log(
+        `${chalk.green('√')}` +
+          ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
+      );
     }
 
     if (config.OPERATION === 'update') {
@@ -74,9 +77,11 @@ async function main() {
         const fileData = index[fileIndex];
         await processFile(API_TOKEN, config.DATA_SOURCE, fileData);
       }
-      console.log(`${chalk.green('√')}` + ` Completed metadata update operation for '${config.dataSourceSelection}' data source`);
+      console.log(
+        `${chalk.green('√')}` +
+          ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
+      );
     }
-
   } catch (error) {
     console.error(`main() Error:\n${error}`);
     logger.error(`main() Error:\n${error}`);
@@ -84,8 +89,10 @@ async function main() {
     const endTime = performance.now();
     const executionTime = (endTime - startTime) / 1000; // Convert ms to seconds
     logger.info(`Done. Execution time: ${executionTime.toFixed(2)} seconds`);
-    console.log(`Done. Execution time: ${chalk.blue(executionTime.toFixed(2))} seconds.` + '\n' + 
-      `Logs can be found in ${chalk.blue(logger.transports[0].dirname)}.`);
+    console.log(
+      `Done - execution time: ${chalk.cyan(executionTime.toFixed(2))} seconds.` +
+        ` Logs can be found in ${chalk.cyan(logger.transports[0].dirname)}.`
+    );
   }
 }
 
@@ -169,7 +176,7 @@ async function processFile(authToken, dataSource, dataObject) {
   }
 }
 
-main ();
+main();
 
 // Check if the current module is the main module before calling main()
 /*if (import.meta.url === `file://${process.argv[1]}`) {
