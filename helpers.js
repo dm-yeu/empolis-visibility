@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import yaml from 'js-yaml';
+import { select, confirm } from '@inquirer/prompts';
 
 /**
  * Namespace for configuration elements
@@ -24,10 +25,11 @@ const __dirname = path.dirname(__filename);
  * @async
  * @function loadConfig
  * @memberof configuration
+ * @param {boolean} [ promptUser = false ] - Prompt user for configuration data
  * @returns {Promise<Object>} Parsed configuration object
  */
 
-export async function loadConfig() {
+export async function loadConfig({ promptUser = false }) {
   try {
     // Build the absolute path to the config.yaml file
     const configPath = path.join(__dirname, 'config.yaml');
@@ -35,7 +37,45 @@ export async function loadConfig() {
     const fileContents = await fs.readFile(configPath, 'utf8');
     // Parse YAML to JavaScript object
     const config = yaml.load(fileContents);
+    // Return the configuration object if promptUser is false
+    if (!promptUser) return config;
+
+    // Prompt user for data source selection
+    config.dataSourceSelection = await select({
+      message: 'Select the data source:',
+      choices: [
+        { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
+        { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
+      ],
+    });
+    // Configure the data source based on user selection
+    switch (config.dataSourceSelection) {
+      case 'iCube':
+        config.DATA_SOURCE = config.ICUBE_DATA_SOURCE;
+        config.FILE_DIR = config.ICUBE_HELP_DIR;
+        break;
+      case 'DWEZ':
+        config.DATA_SOURCE = config.DWEZ_DATA_SOURCE;
+        config.FILE_DIR = config.DWEZ_HELP_DIR;
+        break;
+    };
+    // Prompt user to confirm the directory for the source files of the data source
+    config.OK = await confirm({ message: `The directory for the files of data source`+
+      ` '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?` });
+
+    if (!config.OK) return config;
+    
+    // Prompt user to select the operation to perform on the data source
+    config.OPERATION = await select({
+      message: 'Select the operation to perform on the data source:',
+      choices: [
+        { name: 'Create index file', value: 'index', description: 'Create an index of all files in the data source with associated metadata' },
+        { name: 'Update index file and metadata', value: 'update', description: 'Update the index and metadata for all files in the data source' },
+      ],
+    });
+    
     return config;
+
   } catch (error) {
     console.error(`loadconfig() Error:\n${error}`);
     throw error;
@@ -99,7 +139,7 @@ export async function fileExists(filePath) {
 export async function truncateFile(filePath) {
   try {
     await fs.truncate(filePath, 0);
-    logger.info(`${filePath} truncated successfully.`);
+    logger.debug(`truncateFile():\n${filePath} truncated successfully.`);
     return null;
   } catch (err) {
     logger.error(`Error truncating ${filePath}:\n`, err);
