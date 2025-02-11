@@ -82,6 +82,11 @@ export async function loadConfig({ promptUser = false }) {
           value: 'update',
           description: 'Update the index and metadata for all files in the data source',
         },
+        {
+          name: 'Search the data source',
+          value: 'search',
+          description: 'Search the data source for a specific file',
+        }
       ],
     });
 
