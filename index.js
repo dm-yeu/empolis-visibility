@@ -10,7 +10,7 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import logger, { logPrettyJson } from './logger.js';
 import chalk from 'chalk';
-import { input } from '@inquirer/prompts';
+import { confirm, input } from '@inquirer/prompts';
 import util from 'util';
 
 // Load environment variables
@@ -41,21 +41,26 @@ async function main() {
   const startTime = performance.now();
   logger.info(`Run of empolis-visibility main() started`);
 
-  // Exit if user cancels the operation due to incorrect configuration
-  if (!config.OK) {
-    logger.info(`User cancelled the operation due to configuration errors`);
-    console.log(
-      `${chalk.red('X')}` +
-      ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
-    );
-    return;
-  }
-
   try {
     let fileList = [];
     let indexFile = '';
     // Create index file for the data source if user selects 'index' or 'update' operation
     if (config.OPERATION === 'index' || config.OPERATION === 'update') {
+      // Prompt user to confirm the directory for the source files of the data source
+      config.OK = await confirm({
+        message: `The directory for the files of data source '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
+      });
+
+      // Exit if user cancels the operation due to incorrect configuration
+      if (!config.OK) {
+        logger.info(`User cancelled the operation due to configuration errors`);
+        console.log(
+          `${chalk.red('X')}` +
+            ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
+        );
+        return;
+      }
+
       fileList = await getHtmlFiles(config.FILE_DIR);
       console.log(
         `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
@@ -104,10 +109,11 @@ async function main() {
         const firstResult = searchResults.records[0];
         const downloadLink = firstResult.DownloadLink;
         const fileMetadata = await getFileMetadata({ authToken: API_TOKEN, path: downloadLink });
-        console.log(`  Metadata for ${searchTerm}:` + `\n` +
-          `${util.inspect(fileMetadata, { depth: null, colors: true })}`
+        console.log(
+          `  Metadata for ${searchTerm}:` +
+            `\n` +
+            `${util.inspect(fileMetadata, { depth: null, colors: true })}`
         );
-
       } else {
         console.log(
           `${chalk.red('X')}` +
