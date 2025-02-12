@@ -40,7 +40,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       if (consoleOutput) {
         console.log(
           `${chalk.green('√')}` +
-            ` Results for '${chalk.cyan(searchTerm)}' found in the '${config.dataSourceSelection}' data source.`
+            ` ${chalk.cyan(searchTerm)} found in the '${config.dataSourceSelection}' data source.`
         );
       }
       const firstResult = searchResults.records[0];
@@ -48,9 +48,11 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       const fileMetadata = await getFileMetadata({ authToken: API_TOKEN, path: downloadLink });
       if (consoleOutput) {
         console.log(
+          `\n`+
           `  Metadata for ${searchTerm}:` +
-            `\n` +
-            `${util.inspect(fileMetadata, { depth: null, colors: true })}`
+          `\n` +
+          `${util.inspect(fileMetadata, { depth: null, colors: true })}` +
+          `\n`
         );
       }
       return fileMetadata;
