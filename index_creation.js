@@ -9,7 +9,7 @@ import { fileExists, truncateFile } from './helpers.js';
  * @namespace fileIndex
  */
 
-/** Creates a JSON index of all files in a specified directory
+/** Creates a JSON index of all files in a specified directory and saves it to a file
  * <br> The index includes the filename, title, and breadcrumbs (optional) extracted from the HTML contents
  * @async
  * @function createFileIndex

@@ -10,6 +10,164 @@ import { config } from './index.js';
  */
 
 /**
+ * Cached token information to avoid unnecessary requests
+ * @type {Object}
+ * @property {string} accessToken - access token for Empolis API
+ * @property {string} refreshToken - refresh token for Empolis API
+ * @property {number} accessTokenExpirationTime - expiration time of access token
+ * @property {number} refreshTokenExpirationTime - expiration time of refresh token
+ * @memberof empolisAdmin
+ * @private
+ */
+let tokenCache = {
+  accessToken: null,
+  refreshToken: null,
+  accessTokenExpirationTime: null,
+  refreshTokenExpirationTime: null,
+};
+
+/**
+ * Function to retrieve the authentication token used with the Empolis API. Authentication with the Empolis API is handled via the
+ * [Resource Owner Password Credentials Grant]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant}
+ * method.
+ * <br>Credentials are stored in the .env file (.gitignore) in project root.
+ * <br>Token is cached and reused until expiration. If expired, it attempts to refresh using the refresh token.
+ * @async
+ * @function getToken
+ * @memberof empolisAdmin
+ * @returns {Promise<string>} Token to authenticate Empolis API requests
+ * @requires dotenv
+ * @requires got
+ */
+export async function getToken() {
+  logger.debug(`getToken() started`);
+
+  const currentTime = Date.now();
+
+  // Check if we have a valid cached access token
+  if (
+    tokenCache.accessToken &&
+    tokenCache.accessTokenExpirationTime &&
+    currentTime < tokenCache.accessTokenExpirationTime
+  ) {
+    logger.debug('Using cached access token');
+    return tokenCache.accessToken;
+  }
+
+  // If we have a valid refresh token, try to use it
+  if (
+    tokenCache.refreshToken &&
+    tokenCache.refreshTokenExpirationTime &&
+    currentTime < tokenCache.refreshTokenExpirationTime
+  ) {
+    try {
+      logger.debug('Attempting to use refresh token');
+      const tokenResponse = await refreshAccessToken(tokenCache.refreshToken);
+      // Update token cache with new tokens
+      tokenCache.accessToken = tokenResponse.access_token;
+      tokenCache.refreshToken = tokenResponse.refresh_token;
+      tokenCache.accessTokenExpirationTime = currentTime + (tokenResponse.expires_in - 60) * 1000;
+      tokenCache.refreshTokenExpirationTime = currentTime + 24 * 60 * 60 * 1000; // 24 hours
+
+      logger.debug(
+        `Token refreshed, will expire at: ${new Date(tokenCache.accessTokenExpirationTime).toISOString()}`
+      );
+
+      return tokenCache.accessToken;
+    } catch (error) {
+      logger.warn('Failed to refresh token, will attempt to get new tokens', error);
+      // Clear token cache since refresh failed
+      tokenCache = {
+        accessToken: null,
+        refreshToken: null,
+        accessTokenExpirationTime: null,
+        refreshTokenExpirationTime: null,
+      };
+    }
+  }
+
+  // Token expired, refresh token expired, or no token available --> get new token
+  const url = `${config.BASE_URL}/oauth2/token`;
+
+  const { API_USERNAME, API_PASSWORD, CLIENT_ID, CLIENT_SECRET } = process.env;
+  if (!API_USERNAME || !API_PASSWORD || !CLIENT_ID || !CLIENT_SECRET) {
+    throw new Error('Missing required environment variables');
+  }
+
+  const options = {
+    username: CLIENT_ID,
+    password: CLIENT_SECRET,
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: `grant_type=password&username=${API_USERNAME}&password=${API_PASSWORD}&scope=${config.API_SCOPE}`,
+  };
+
+  try {
+    const response = await got.post(url, options);
+    logResponse(response, 'getToken() got response');
+
+    const tokenResponse = JSON.parse(response.body);
+
+    // Cache the new tokens
+    tokenCache.accessToken = tokenResponse.access_token;
+    tokenCache.refreshToken = tokenResponse.refresh_token;
+    tokenCache.accessTokenExpirationTime = currentTime + (tokenResponse.expires_in - 60) * 1000;
+    tokenCache.refreshTokenExpirationTime = currentTime + 24 * 60 * 60 * 1000; // 24 hours
+
+    logger.debug(
+      `New tokens cached, access token will expire at: ${new Date(tokenCache.accessTokenExpirationTime).toISOString()}`
+    );
+
+    return tokenCache.accessToken;
+  } catch (error) {
+    // Clear cache on error
+    tokenCache = {
+      accessToken: null,
+      refreshToken: null,
+      accessTokenExpirationTime: null,
+      refreshTokenExpirationTime: null,
+    };
+    logger.error(`getToken() Error:\n${error}`);
+    throw error;
+  }
+}
+
+/**
+ * Function to refresh the access token using a refresh token
+ * @async
+ * @function refreshAccessToken
+ * @private
+ * @param {string} refreshToken - The refresh token to use
+ * @returns {Promise<Object>} Object containing the new access token and refresh token
+ * @throws {Error} If the refresh token is invalid or expired
+ */
+async function refreshAccessToken(refreshToken) {
+  logger.debug('Attempting to refresh access token');
+
+  const { CLIENT_ID, CLIENT_SECRET } = process.env;
+  const url = `${config.BASE_URL}/oauth2/token`;
+
+  const options = {
+    username: CLIENT_ID,
+    password: CLIENT_SECRET,
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
+  };
+
+  try {
+    const response = await got.post(url, options);
+    logResponse(response, 'refreshAccessToken() got response');
+    return JSON.parse(response.body);
+  } catch (error) {
+    logger.error(`refreshAccessToken() Error:\n${error}`);
+    throw error;
+  }
+}
+
+/**
  * Function to check status of all Empolis API services
  * @async
  * @function checkApiStatus
@@ -18,7 +176,6 @@ import { config } from './index.js';
  * @requires ./empolis_functions.js
  * @returns error if an API is not operational
  */
-
 export async function checkApiStatus(authToken) {
   logger.debug(`checkApiStatus() started`);
 
@@ -41,58 +198,6 @@ export async function checkApiStatus(authToken) {
 }
 
 /**
- * Function to retrieve the authentication token used with the Empolis API. Authentication with the Empolis API is handled via the
- * [Resource Owner Password Credentials Grant]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/getting-started/api-authorization#curl-resource-owner-password-credentials-grant}
- * method.
- * <br>Credentials are stored in the .env file (.gitignore) in project root.
- * @async
- * @function getToken
- * @memberof empolisAdmin
- * @returns {Promise<string>} Token to authenticate Empolis API requests
- * @requires dotenv
- * @requires got
- */
-
-export async function getToken() {
-  logger.debug(`getToken() started`);
-
-  const url = `${config.BASE_URL}/oauth2/token`;
-
-  // Get credentials from process.env - ensure dotenv.config() is called previously in main
-  const { API_USERNAME, API_PASSWORD, CLIENT_ID, CLIENT_SECRET } = process.env;
-
-  if (!API_USERNAME || !API_PASSWORD || !CLIENT_ID || !CLIENT_SECRET) {
-    throw new Error('Missing required environment variables');
-  }
-
-  // Define POST request body
-  const data = `grant_type=password&username=${API_USERNAME}&password=${API_PASSWORD}&scope=${config.API_SCOPE}`;
-
-  // Define got() request options
-  const options = {
-    url,
-    method: 'POST',
-    username: CLIENT_ID,
-    password: CLIENT_SECRET,
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded',
-    },
-    body: data,
-  };
-
-  try {
-    // Make token request to Empolis API
-    const response = await got(options);
-    logResponse(response, 'getToken() got response');
-
-    // Return the access token
-    return JSON.parse(response.body).access_token;
-  } catch (error) {
-    logger.error(`getToken() Error:\n${error}`);
-  }
-}
-
-/**
  * Function to retrieve the status of a specified Empolis API.
  * @async
  * @function apiOperational
@@ -103,7 +208,6 @@ export async function getToken() {
  * @returns {Promise<string>} operational status of the API (true if operational)
  * @requires got
  */
-
 export async function apiOperational({ authToken, apiName, apiVersion }) {
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
 

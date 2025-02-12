@@ -6,6 +6,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.3.1",
+    "@inquirer/select": "^4.0.8",
     "cheerio": "^1.0.0",
     "clean-jsdoc-theme": "^4.3.0",
     "console-animations": "^1.1.1",
