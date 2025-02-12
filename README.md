@@ -1,18 +1,32 @@
-# Help File Metadata Update in Empolis
+# Metadata Update in Empolis
 
-Several help files (iCube Engineer, DriveWorks EZ) are integrated as data sources in Empolis via the Empolis Box. The metadata of the HTML files must be adapted in Empolis to be human readable, and improve search results.
+Several data sources are integrated in Empolis via the Empolis Box.
 
-This project reads specified tags from the HTML sources, and updates the metadata of the corresponding file in Empolis via the API.
+- iCube Engineer Help File
+- DriveWorks EZ Help File
+- YEC Drives Technical Information Database
+- YEC Drives Application Know-How Database
+- ELO DMC Knowledge Base
+
+The metadata of the files must be adapted in Empolis to be human readable, and improve search results. Additionally, visibility tags need to be set according to the configured access level.
+
+This project extracts the relevant metadata from the files and updates it in Empolis via the API. Additionally, visibility tags can be set.
 
 ## Files
 
 - `index.js` --> main
-- `empolis_functions.js` --> functions that interface to Empolis
+- `empolis_admin.js` --> administrative functions that interface to Empolis
+- `empolis_ops.js` --> miscelaneous operations in Empolis
+- `empolis_search.js` --> search operations in Empolis
+- `index_creation.js` --> creation of index of all files in the data source
 - `helpers.js` --> helper functions
 - `logger.js` --> 'winston' logger configuration
-- `.env` --> environment variables such as username, password, clientID, and clientSecret
+- `.env` --> environment variables for secrets (.gitignore)
+- `config.yaml` --> app configuration file
+- `.prettierrc` --> prettier formatter configuration file
+- `eslint.config.js` --> eslint linter configuration file
 
-## Modules
+## Documentation
 
 Documented via jsdoc (see HTML in `./jsdoc`).
 
@@ -24,6 +38,4 @@ Authentication with the Empolis API is handled via the [_Resource Owner Password
 
 ## Backlog
 
-- Implement configuration validation
-- Implement batch processing for parallel file handling
-- Unit testing (Jest or Mocha)
+- See [Github Issues](https://github.com/dm-yeu/empolis-visibility/issues)
