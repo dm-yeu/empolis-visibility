@@ -1,7 +1,7 @@
 // Imports
 import { getToken, checkApiStatus } from './empolis_admin.js';
-import { vfqSearch } from './empolis_search.js';
-import { getFileMetadata, editFileMetadata } from './empolis_ops.js';
+import { fileSearch } from './empolis_search.js';
+import { editFileMetadata } from './empolis_ops.js';
 import { loadConfig, getHtmlFiles, readJsonData } from './helpers.js';
 import { createFileIndex } from './index_creation.js';
 import { performance } from 'node:perf_hooks';
@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 import logger, { logPrettyJson } from './logger.js';
 import chalk from 'chalk';
 import { confirm, input } from '@inquirer/prompts';
-import util from 'util';
 
 // Load environment variables
 const __filename = fileURLToPath(import.meta.url);
@@ -54,33 +53,9 @@ async function main() {
     }
 
     if (config.OPERATION === 'file_search') {
-      const API_TOKEN = await getToken();
-      await checkApiStatus(API_TOKEN);
       const searchTerm = await input({ message: 'Enter the filename to search for:' });
-      const searchResults = await vfqSearch({
-        authToken: API_TOKEN,
-        source: config.DATA_SOURCE,
-        searchTerm,
-      });
-      if (searchResults?.records?.length) {
-        console.log(
-          `${chalk.green('√')}` +
-            ` Results for '${chalk.cyan(searchTerm)}' found in the '${config.dataSourceSelection}' data source.`
-        );
-        const firstResult = searchResults.records[0];
-        const downloadLink = firstResult.DownloadLink;
-        const fileMetadata = await getFileMetadata({ authToken: API_TOKEN, path: downloadLink });
-        console.log(
-          `  Metadata for ${searchTerm}:` +
-            `\n` +
-            `${util.inspect(fileMetadata, { depth: null, colors: true })}`
-        );
-      } else {
-        console.log(
-          `${chalk.red('X')}` +
-            ` No search results for '${chalk.cyan(searchTerm)}' found in the '${config.dataSourceSelection}' data source`
-        );
-      }
+      const fileMetadata = await fileSearch({ searchTerm, consoleOutput: true });
+      logger.info(`fileMetadata:\n${JSON.stringify(fileMetadata)}`);
     }
   } catch (error) {
     console.error(`main() Error:\n${error}`);
@@ -107,7 +82,6 @@ async function main() {
  * @returns {Promise<Object>} Object containing the list of files as an array, and the index file path
  */
 async function createUpdateIndexFile() {
-
   try {
     // Prompt user to confirm the directory for the source files of the data source
     config.OK = await confirm({
@@ -128,7 +102,9 @@ async function createUpdateIndexFile() {
     console.log(
       `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
     );
-    logger.info(`Found ${fileList.length} HTML files in data source directory. Creating index file.`);
+    logger.info(
+      `Found ${fileList.length} HTML files in data source directory. Creating index file.`
+    );
     const indexFile = await createFileIndex({
       directoryPath: config.FILE_DIR,
       fileList,
@@ -137,13 +113,14 @@ async function createUpdateIndexFile() {
       `${chalk.green('√')}` +
         ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
     );
-    logger.info(`Index file for '${config.dataSourceSelection}' source data created at ${indexFile}`);
+    logger.info(
+      `Index file for '${config.dataSourceSelection}' source data created at ${indexFile}`
+    );
     return { fileList, indexFile };
   } catch (error) {
     if (error.message === 'Operation cancelled') {
       return { fileList: [], indexFile: '' };
-    }
-    else {
+    } else {
       logger.error(`createUpdateIndexFile() Error:\n${error}`);
       throw new Error(`Failed to create index file: ${error.message}`);
     }
@@ -171,13 +148,15 @@ async function updateCloudMetadata({ fileList, indexFile }) {
   for (const file of fileList) {
     const fileIndex = index.findIndex((obj) => obj.filename === file);
     const fileData = index[fileIndex];
-    await processFile(API_TOKEN, config.DATA_SOURCE, fileData);
+    await processFile(API_TOKEN, fileData);
   }
   console.log(
     `${chalk.green('√')}` +
       ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
   );
-  logger.info(`Completed metadata update operation for '${config.dataSourceSelection}' data source`);
+  logger.info(
+    `Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
   return null;
 }
 
@@ -194,26 +173,12 @@ async function updateCloudMetadata({ fileList, indexFile }) {
  * @returns nothing
  */
 
-async function processFile(authToken, dataSource, dataObject) {
+async function processFile(authToken, dataObject) {
   logger.info(`Processing ${dataObject.filename}`);
   logger.debug(`dataObject: ${JSON.stringify(dataObject)}`);
 
-  // Search for file in the Empolis index to get the 'DownloadLink' attribute
-  const searchResults = await vfqSearch({
-    authToken,
-    source: dataSource,
-    searchTerm: dataObject.filename,
-  });
-  if (!searchResults?.records?.length) {
-    logger.warn(`No search results for the term '${dataObject.filename}' found in the index`);
-    return;
-  }
-
-  const firstResult = searchResults.records[0];
-  const downloadLink = firstResult.DownloadLink;
-
-  // Get the metadata of the file with the specified 'DownloadLink'
-  const fileMetadata = await getFileMetadata({ authToken, path: downloadLink });
+  // Search for file in the Empolis index to get the current metadata
+  const fileMetadata = await fileSearch({ searchTerm: dataObject.filename, consoleOutput: false });
 
   let newKeywords = '';
   if (dataObject.breadcrumbs) {
