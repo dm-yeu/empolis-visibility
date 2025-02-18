@@ -34,6 +34,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       authToken: API_TOKEN,
       searchTerm: `${config.DATA_SOURCE}/${searchTerm}`,
       searchAttribute: 'DownloadLink',
+      resultAttributes: ['Title', 'FileName', 'DownloadLink'],
       maxResults: 1,
     });
     if (searchResults?.records?.length) {
@@ -80,7 +81,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
  * @param {string} authToken - authentication token for API requests
  * @param {string} searchTerm - search term in natural language
  * @param {string} [ searchAttribute = "" ] - attribute to search, default is all text attributes
- * @param {array} [ resultAttributes = [] ] - attributes to return in search results, default is all attributes
+ * @param {array} [ resultAttributes = null ] - attributes to return in search results, default is all attributes
  * @param {number} [ maxResults = 10 ] - maximum number of search results, default is 10
  * @returns {Promise<JSON>} search results
  * @requires got
@@ -90,10 +91,15 @@ export async function nlqSearch({
   authToken, 
   searchTerm,
   searchAttribute = "",
-  resultAttributes = [],
+  resultAttributes = null,
   maxResults = 10,
 }) {
   logger.debug(`nlqSearch() started`);
+
+  // Validate resultAttributes parameter
+  if (resultAttributes !== null && !Array.isArray(resultAttributes)) {
+    throw new Error(`resultAttributes must be an array of strings or null`);
+  }
 
   const url = `${config.BASE_URL}/api/ias/${config.IAS_API_VERSION}/index/project1_p/search`;
 
@@ -136,8 +142,7 @@ export async function nlqSearch({
  * @param {string} authToken - authentication token for API requests
  * @param {string} searchTerm - search term in natural language
  * @param {string} [ searchAttribute = "DownloadLink" ] - attribute to search, default is "DownloadLink"
- * @param {array} [ resultAttributes = ["Title", "FileName", "DownloadLink"] ] - attributes to return in search results,
- *  default is 'Title' 'FileName', and 'DownloadLink'
+ * @param {array} [ resultAttributes = null ] - attributes to return in search results, default is all attributes
  * @param {number} [ maxResults = 1 ] - maximum number of search results, default is 1
  * @returns {Promise<JSON>} search results
  * @requires got
@@ -147,13 +152,18 @@ export async function vfqSearch({
   authToken,
   searchTerm,
   searchAttribute = 'DownloadLink',
-  resultAttributes = ['Title', 'FileName', 'DownloadLink'],
+  resultAttributes = null,
   maxResults = 1,
 }) {
   logger.debug(`vfqSearch() started`);
 
   if (searchAttribute === 'FileName') {
     throw new Error(`FileName attribute not allowed`);
+  }
+
+  // Validate resultAttributes parameter
+  if (resultAttributes !== null && !Array.isArray(resultAttributes)) {
+    throw new Error(`resultAttributes must be an array of strings or null`);
   }
 
   // Define got() request options
