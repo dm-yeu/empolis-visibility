@@ -1,0 +1,1488 @@
+{
+  "kpacks": [
+      "kpacks/ExternalLink/1.0.1",
+      "kpacks/pimcore_category/1.0.0",
+      "kpacks/pimcore_keywords/1.0.1",
+      "kpacks/KnowledgeGraph/0.0.49"
+  ],
+  "schema": {
+      "_domainConfigName": "t624_project1_p",
+      "_enabledKPacks": {
+          "attributes": [
+              {
+                  "attribute": "ese_ExternalLink",
+                  "class": "ese.ExternalLink"
+              },
+              {
+                  "attribute": "pimcore_keywords",
+                  "cardinality": "single",
+                  "class": "pimcore_keywords",
+                  "dataType": "string"
+              },
+              {
+                  "attribute": "StatusLebenszyklus",
+                  "autoTagging": [
+                      {
+                          "mode": "keep",
+                          "source": "_all",
+                          "target": "StatusLebenszyklus"
+                      }
+                  ],
+                  "class": "StatusLebenszyklus",
+                  "labels": {
+                      "de": "Status Lebenszyklus",
+                      "en": "Lifecycle Status"
+                  }
+              },
+              {
+                  "attribute": "skilllevel",
+                  "autoTagging": [
+                      {
+                          "mode": "merge",
+                          "source": "FilePath",
+                          "target": "skilllevel"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "Content",
+                          "target": "skilllevel"
+                      }
+                  ],
+                  "class": "skilllevel",
+                  "labels": {
+                      "de": "Access Level",
+                      "en": "Access Level"
+                  }
+              },
+              {
+                  "attribute": "dokumentenherkunft",
+                  "autoTagging": [
+                      {
+                          "mode": "keep",
+                          "source": "Title",
+                          "target": "dokumentenherkunft"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "FilePath",
+                          "target": "dokumentenherkunft"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "FileName",
+                          "target": "dokumentenherkunft"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "Content",
+                          "target": "dokumentenherkunft"
+                      }
+                  ],
+                  "class": "dokumentenherkunft",
+                  "labels": {
+                      "de": "Dokumentenherkunft",
+                      "en": "Document Origin"
+                  }
+              },
+              {
+                  "attribute": "doctype",
+                  "autoTagging": [
+                      {
+                          "mode": "keep",
+                          "source": "FilePath",
+                          "target": "doctype"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "FileName",
+                          "target": "doctype"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "Content",
+                          "target": "doctype"
+                      }
+                  ],
+                  "class": "doctype",
+                  "labels": {
+                      "de": "Dokumenttyp",
+                      "en": "Document Type"
+                  }
+              },
+              {
+                  "attribute": "product",
+                  "autoTagging": [
+                      {
+                          "mode": "keep",
+                          "source": "Title",
+                          "target": "product"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "FilePath",
+                          "target": "product"
+                      },
+                      {
+                          "mode": "keep",
+                          "source": "FileName",
+                          "target": "product"
+                      }
+                  ],
+                  "class": "product",
+                  "labels": {
+                      "de": "Produkt",
+                      "en": "Product"
+                  }
+              },
+              {
+                  "attribute": "pimcore_category",
+                  "cardinality": "single",
+                  "class": "pimcore_category",
+                  "dataType": "string"
+              }
+          ],
+          "force": true,
+          "kpackDependencies": [],
+          "kpacks": [
+              {
+                  "id": "custom/ExternalLink/1.0.1",
+                  "labels": {
+                      "de": "ExternalLink",
+                      "en": "ExternalLink"
+                  },
+                  "name": "ExternalLink",
+                  "type": "custom",
+                  "version": "1.0.1"
+              },
+              {
+                  "id": "custom/pimcore_category/1.0.0",
+                  "labels": {
+                      "de": "pimcore_category",
+                      "en": "pimcore_category"
+                  },
+                  "name": "pimcore_category",
+                  "type": "custom",
+                  "version": "1.0.0"
+              },
+              {
+                  "id": "custom/pimcore_keywords/1.0.1",
+                  "labels": {
+                      "de": "pimcore_keywords",
+                      "en": "pimcore_keywords"
+                  },
+                  "name": "pimcore_keywords",
+                  "type": "custom",
+                  "version": "1.0.1"
+              },
+              {
+                  "id": "custom/KnowledgeGraph/0.0.49",
+                  "labels": {
+                      "de": "KnowledgeGraph",
+                      "en": "KnowledgeGraph"
+                  },
+                  "name": "KnowledgeGraph",
+                  "type": "custom",
+                  "version": "0.0.49"
+              }
+          ]
+      },
+      "_enabledKPacks_savedExpansions": {
+          "ascendants": {
+              "childWeight": 0,
+              "parentWeight": 0.7,
+              "threshold": 0,
+              "type": "_taxonomySimilarity"
+          },
+          "cc": {
+              "distance": 3,
+              "factor": 0.95,
+              "maxCombine": 2,
+              "type": "_compoundComponents"
+          },
+          "descendants": {
+              "childWeight": 1,
+              "parentWeight": 0,
+              "threshold": 0,
+              "type": "_taxonomySimilarity"
+          },
+          "ec": {
+              "factor": 0.95,
+              "type": "_expandCompound"
+          },
+          "standardTaxonomy": {
+              "childWeight": 0.8,
+              "parentWeight": 0.6,
+              "threshold": 0.2,
+              "type": "_taxonomySimilarity"
+          }
+      },
+      "_indexName": "project1_p",
+      "analysisConfig": {
+          "Comment_txt": [
+              "km"
+          ],
+          "Content": [
+              "km"
+          ],
+          "FileName": [
+              "km"
+          ],
+          "FilePath": [
+              "km"
+          ],
+          "Keywords_txt": [
+              "km"
+          ],
+          "Label": [
+              "km"
+          ],
+          "Memo_3rdParty": [
+              "km"
+          ],
+          "Memo_Attachments": [
+              "km"
+          ],
+          "Memo_Download": [
+              "km"
+          ],
+          "Memo_External": [
+              "km"
+          ],
+          "Memo_Image": [
+              "km"
+          ],
+          "Memo_Imagemap": [
+              "km"
+          ],
+          "Memo_Internal": [
+              "km"
+          ],
+          "Memo_LongText_txt": [
+              "km"
+          ],
+          "Memo_PDF": [
+              "km"
+          ],
+          "Memo_URL": [
+              "km"
+          ],
+          "Memo_Video": [
+              "km"
+          ],
+          "Phrase": [
+              "km"
+          ],
+          "Title": [
+              "km"
+          ]
+      },
+      "analysisMapping": [
+          {
+              "class": "StatusLebenszyklus",
+              "mode": "keep",
+              "source": "_all",
+              "target": "StatusLebenszyklus"
+          },
+          {
+              "class": "skilllevel",
+              "mode": "merge",
+              "source": "FilePath",
+              "target": "skilllevel"
+          },
+          {
+              "class": "skilllevel",
+              "mode": "keep",
+              "source": "Content",
+              "target": "skilllevel"
+          },
+          {
+              "class": "dokumentenherkunft",
+              "mode": "keep",
+              "source": "Title",
+              "target": "dokumentenherkunft"
+          },
+          {
+              "class": "dokumentenherkunft",
+              "mode": "keep",
+              "source": "FilePath",
+              "target": "dokumentenherkunft"
+          },
+          {
+              "class": "dokumentenherkunft",
+              "mode": "keep",
+              "source": "FileName",
+              "target": "dokumentenherkunft"
+          },
+          {
+              "class": "dokumentenherkunft",
+              "mode": "keep",
+              "source": "Content",
+              "target": "dokumentenherkunft"
+          },
+          {
+              "class": "doctype",
+              "mode": "keep",
+              "source": "FilePath",
+              "target": "doctype"
+          },
+          {
+              "class": "doctype",
+              "mode": "keep",
+              "source": "FileName",
+              "target": "doctype"
+          },
+          {
+              "class": "doctype",
+              "mode": "keep",
+              "source": "Content",
+              "target": "doctype"
+          },
+          {
+              "class": "product",
+              "mode": "keep",
+              "source": "Title",
+              "target": "product"
+          },
+          {
+              "class": "product",
+              "mode": "keep",
+              "source": "FilePath",
+              "target": "product"
+          },
+          {
+              "class": "product",
+              "mode": "keep",
+              "source": "FileName",
+              "target": "product"
+          }
+      ],
+      "annotators": {
+          "km": {
+              "failOnError": false
+          },
+          "rbl": {
+              "timeout": 120000
+          },
+          "regex": {
+              "failOnError": false
+          },
+          "ruta": {
+              "failOnError": false,
+              "timeout": 120000
+          },
+          "tagCloud": {
+              "failOnError": false
+          }
+      },
+      "attributes": {
+          "AggregationKey": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Aggregation Key",
+                  "en": "Aggregation Key"
+              },
+              "result": "value"
+          },
+          "Author": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Autor",
+                  "en": "Author"
+              },
+              "result": "value"
+          },
+          "Category": {
+              "cardinality": "single",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "label": {
+                  "de": "Kategorie",
+                  "en": "Category"
+              },
+              "result": "value"
+          },
+          "Comment": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Beschreibung",
+                  "en": "Description"
+              },
+              "result": "value"
+          },
+          "Comment_txt": {
+              "dataType": "text",
+              "label": {
+                  "de": "Beschreibung",
+                  "en": "Description"
+              },
+              "result": "bestPassage",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Content": {
+              "dataType": "text",
+              "label": {
+                  "de": "Inhalt",
+                  "en": "Content"
+              },
+              "result": [
+                  "bestPassage",
+                  "abstract"
+              ],
+              "termClasses": [
+                  "literal",
+                  "stem"
+              ]
+          },
+          "DecisionTree": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Tree ID",
+                  "en": "Tree ID"
+              },
+              "result": "value"
+          },
+          "DocumentType": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Dokumenttyp",
+                  "en": "Document Type"
+              },
+              "result": "value"
+          },
+          "DownloadLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Download Link",
+                  "en": "Download Link"
+              },
+              "result": "value"
+          },
+          "FileName": {
+              "dataType": "text",
+              "label": {
+                  "de": "Dateiname",
+                  "en": "File Name"
+              },
+              "result": "highlight",
+              "sort": {
+                  "country": "DE",
+                  "lang": "de"
+              },
+              "termClasses": [
+                  "literal",
+                  "stem"
+              ]
+          },
+          "FilePath": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Dateipfad",
+                  "en": "File Path"
+              },
+              "result": "value"
+          },
+          "FileSize": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Dateigröße",
+                  "en": "File Size"
+              },
+              "result": "value"
+          },
+          "IndexedPageCount": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Anzahl der indizierten Seiten",
+                  "en": "Indexed page count"
+              },
+              "result": "value"
+          },
+          "Keywords": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Keywords",
+                  "en": "Keywords"
+              },
+              "result": "value"
+          },
+          "Keywords_txt": {
+              "dataType": "text",
+              "label": {
+                  "de": "Keywords",
+                  "en": "Keywords"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Label": {
+              "dataType": "text",
+              "label": {
+                  "de": "Label",
+                  "en": "Label"
+              },
+              "result": "highlight",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Language": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Sprache",
+                  "en": "Language"
+              },
+              "result": "value"
+          },
+          "LeadingVariantId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "LeadingVariantId",
+                  "en": "LeadingVariantId"
+              },
+              "result": "value"
+          },
+          "Memo_3rdParty": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: 3rdParty",
+                  "en": "Memo: 3rdParty"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Attachments": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Attachments",
+                  "en": "Memo: Attachments"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Download": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Download",
+                  "en": "Memo: Download"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_External": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: External",
+                  "en": "Memo: External"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Image": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Image",
+                  "en": "Memo: Image"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Imagemap": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Imagemap",
+                  "en": "Memo: Imagemap"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Internal": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Internal",
+                  "en": "Memo: Internal"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_LongText": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Memo: LongText",
+                  "en": "Memo: LongText"
+              },
+              "result": "value"
+          },
+          "Memo_LongText_txt": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: LongText",
+                  "en": "Memo: LongText"
+              },
+              "result": "bestPassage",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_PDF": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: PDF",
+                  "en": "Memo: PDF"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_URL": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: URL",
+                  "en": "Memo: URL"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "Memo_Video": {
+              "dataType": "text",
+              "label": {
+                  "de": "Memo: Video",
+                  "en": "Memo: Video"
+              },
+              "result": "value",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "ModificationDate": {
+              "cardinality": "single",
+              "dataType": "date",
+              "histogram": true,
+              "label": {
+                  "de": "Änderungsdatum",
+                  "en": "Modification Date"
+              },
+              "result": "value"
+          },
+          "ModificationTimestamp": {
+              "cardinality": "single",
+              "dataType": "timestamp",
+              "label": {
+                  "de": "Änderungsdatum",
+                  "en": "Modification Date"
+              },
+              "result": "value"
+          },
+          "MultiLanguage": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "MultiLanguage",
+                  "en": "MultiLanguage"
+              },
+              "result": "value"
+          },
+          "PageCount": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Seitenanzahl",
+                  "en": "Page Count"
+              },
+              "result": "value"
+          },
+          "PageNumber": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Seitennummer",
+                  "en": "Page Number"
+              },
+              "result": "value"
+          },
+          "Phrase": {
+              "dataType": "text",
+              "label": {
+                  "de": "Lösungstext",
+                  "en": "Solution Phrase"
+              },
+              "result": "highlight",
+              "sort": {
+                  "country": "US",
+                  "lang": "en"
+              }
+          },
+          "PreviewLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Vorschau Link",
+                  "en": "Preview Link"
+              },
+              "result": "value"
+          },
+          "Roles": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Rollen",
+                  "en": "Roles"
+              },
+              "result": "value"
+          },
+          "SolutionId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Lösungs-ID",
+                  "en": "Solution ID"
+              },
+              "result": "value"
+          },
+          "Source": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Quelle",
+                  "en": "Source"
+              },
+              "result": "value"
+          },
+          "SourceLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Link zur Quelle",
+                  "en": "Link to Source"
+              },
+              "result": "value"
+          },
+          "StatusLebenszyklus": {
+              "cardinality": "multi",
+              "class": "StatusLebenszyklus",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "label": {
+                  "de": "Status Lebenszyklus",
+                  "en": "Lifecycle Status"
+              },
+              "result": "value"
+          },
+          "Title": {
+              "dataType": "text",
+              "label": {
+                  "de": "Titel",
+                  "en": "Title"
+              },
+              "result": "highlight",
+              "sort": {
+                  "country": "DE",
+                  "lang": "de"
+              },
+              "termClasses": [
+                  "literal",
+                  "stem"
+              ]
+          },
+          "ZipId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Zip ID",
+                  "en": "Zip ID"
+              },
+              "result": "value"
+          },
+          "doctype": {
+              "cardinality": "multi",
+              "class": "doctype",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "isTaxonomy": true,
+              "label": {
+                  "de": "Dokumenttyp",
+                  "en": "Document Type"
+              },
+              "result": "value",
+              "taxonomyLevels": 2
+          },
+          "dokumentenherkunft": {
+              "cardinality": "multi",
+              "class": "dokumentenherkunft",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "label": {
+                  "de": "Dokumentenherkunft",
+                  "en": "Document Origin"
+              },
+              "result": "value"
+          },
+          "esc_AttachmentLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Anhangslink",
+                  "en": "Attachment Link"
+              },
+              "result": "value"
+          },
+          "esc_AttachmentLinks": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Anhangslinks",
+                  "en": "Attachment Links"
+              },
+              "result": "value"
+          },
+          "esc_AttachmentSize": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Anhangsgröße",
+                  "en": "Attachment Size"
+              },
+              "result": "value"
+          },
+          "esc_ContainerLink": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Container Link",
+                  "en": "Container Link"
+              },
+              "result": "value"
+          },
+          "esc_CreationDate": {
+              "cardinality": "single",
+              "dataType": "date",
+              "histogram": true,
+              "label": {
+                  "de": "Erstellungsdatum",
+                  "en": "Creation Date"
+              },
+              "result": "value"
+          },
+          "esc_CreationTimestamp": {
+              "cardinality": "single",
+              "dataType": "timestamp",
+              "label": {
+                  "de": "Erstellungszeitpunkt",
+                  "en": "Creation Time"
+              },
+              "result": "value"
+          },
+          "esc_DerivedLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Derived Link",
+                  "en": "Derived Link"
+              },
+              "result": "value"
+          },
+          "esc_Languages": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Sprachen",
+                  "en": "Languages"
+              },
+              "result": "value"
+          },
+          "esc_PDFLink": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "PDF Link",
+                  "en": "PDF Link"
+              },
+              "result": "value"
+          },
+          "esc_dtRoleIds": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "DT Rollen",
+                  "en": "DT roles"
+              },
+              "result": "value"
+          },
+          "esc_objectId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Object ID",
+                  "en": "Object ID"
+              },
+              "result": "value"
+          },
+          "esc_unitId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "ESC Unit ID",
+                  "en": "ESC Unit ID"
+              },
+              "result": "value"
+          },
+          "ese_AvailableFrom": {
+              "cardinality": "single",
+              "dataType": "timestamp",
+              "label": {
+                  "de": "Verfügbar ab",
+                  "en": "Available from"
+              },
+              "result": "value"
+          },
+          "ese_AvailableTo": {
+              "cardinality": "single",
+              "dataType": "timestamp",
+              "label": {
+                  "de": "Verfügbar bis",
+                  "en": "Available to"
+              },
+              "result": "value"
+          },
+          "ese_ChatDuration": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Dauer in Stunden",
+                  "en": "Duration in hours"
+              },
+              "result": "value"
+          },
+          "ese_ChatMemberCount": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Chatteilnehmeranzahl",
+                  "en": "Chat Member Count"
+              },
+              "result": "value"
+          },
+          "ese_ChatMessageCount": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Chatnachrichtenanzahl",
+                  "en": "Chat Message Count"
+              },
+              "result": "value"
+          },
+          "ese_ChatReactionScore": {
+              "cardinality": "single",
+              "dataType": "float",
+              "label": {
+                  "de": "Chatreaktionenpunktzahl",
+                  "en": "Chat Reaction Score"
+              },
+              "result": "value"
+          },
+          "ese_ChatReactions": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Chatreaktionen",
+                  "en": "Chat Reactions"
+              },
+              "result": "value"
+          },
+          "ese_ChatStatus": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Chat Status",
+                  "en": "Chat Status"
+              },
+              "result": "value"
+          },
+          "ese_EditorialStatus": {
+              "cardinality": "multi",
+              "dataType": "string",
+              "label": {
+                  "de": "Bearbeitungsstatus",
+                  "en": "Editorial Status"
+              },
+              "result": "value"
+          },
+          "ese_ExternalLink": {
+              "cardinality": "multi",
+              "class": "ese.ExternalLink",
+              "dataType": "string",
+              "label": {
+                  "de": "Externer Link",
+                  "en": "External link"
+              },
+              "result": "value"
+          },
+          "ese_OwnerId": {
+              "cardinality": "single",
+              "dataType": "string",
+              "label": {
+                  "de": "Eigentümer-Id",
+                  "en": "Owner id"
+              },
+              "result": "value"
+          },
+          "ese_VisibilityLevel": {
+              "cardinality": "single",
+              "dataType": "int",
+              "label": {
+                  "de": "Sichtbarkeit",
+                  "en": "Visibility"
+              },
+              "result": "value"
+          },
+          "pimcore_category": {
+              "cardinality": "single",
+              "class": "pimcore_category",
+              "dataType": "string",
+              "label": {
+                  "de": "pimcore_category",
+                  "en": "pimcore_category"
+              },
+              "result": "value"
+          },
+          "pimcore_keywords": {
+              "cardinality": "single",
+              "class": "pimcore_keywords",
+              "dataType": "string",
+              "label": {
+                  "de": "pimcore_keywords",
+                  "en": "pimcore_keywords"
+              },
+              "result": "value"
+          },
+          "product": {
+              "cardinality": "multi",
+              "class": "product",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "isTaxonomy": true,
+              "label": {
+                  "de": "Produkt",
+                  "en": "Product"
+              },
+              "result": "value",
+              "taxonomyLevels": 5
+          },
+          "skilllevel": {
+              "cardinality": "multi",
+              "class": "skilllevel",
+              "dataType": "string",
+              "hasLocalizedValues": true,
+              "label": {
+                  "de": "Access Level",
+                  "en": "Access Level"
+              },
+              "result": "value"
+          }
+      },
+      "brs": {
+          "carryOperator": false,
+          "defaultDistance": 3,
+          "defaultOperator": "&",
+          "operatorLanguage": "en"
+      },
+      "characterClasses": {
+          "delimiter": [
+              "\"",
+              "(",
+              ")",
+              "*",
+              ";",
+              "<",
+              ">",
+              "[",
+              "]",
+              "^",
+              "{",
+              "|",
+              "}",
+              "«",
+              "»",
+              "“",
+              "”",
+              "„",
+              "‟",
+              "‹",
+              "›",
+              "/",
+              "\\"
+          ],
+          "hyphen": [
+              "-",
+              "˗",
+              "‐",
+              "‑",
+              "‒",
+              "–",
+              "—",
+              "―",
+              "⁃",
+              "−",
+              "⏤",
+              "─",
+              "━",
+              "⸺",
+              "⸻",
+              "﹣",
+              "－",
+              "_"
+          ],
+          "joinChar": [
+              "!",
+              ",",
+              ":",
+              "?"
+          ],
+          "regex": "(\\d+(\\.\\d[\\w-]*)+)",
+          "skipChar": [
+              "'",
+              "`",
+              "´",
+              "ʻ",
+              "ʼ",
+              "ˈ",
+              "‘",
+              "’",
+              "‚",
+              "‛",
+              "′"
+          ],
+          "softDelimiter": [
+              "."
+          ],
+          "tokenChar": [
+              "#",
+              "$",
+              "%",
+              "&",
+              "+",
+              "=",
+              "@",
+              "~",
+              "§",
+              "°",
+              "µ",
+              "€"
+          ]
+      },
+      "customAnnotatorConfig": [],
+      "documentParts": true,
+      "documentTypes": {
+          "Archive": [
+              "zip"
+          ],
+          "Document": [
+              "xls",
+              "xlsx",
+              "ods",
+              "pdf",
+              "ppt",
+              "pptx",
+              "odp",
+              "txt",
+              "log",
+              "rtf",
+              "htm",
+              "html",
+              "doc",
+              "docx",
+              "odt"
+          ],
+          "Image": [
+              "bmp",
+              "gif",
+              "jpg",
+              "jpeg",
+              "png",
+              "svg"
+          ],
+          "Program": [
+              "exe"
+          ],
+          "Video": [
+              "mp4"
+          ]
+      },
+      "expansion": {
+          "StatusLebenszyklus": {
+              "distance": 3,
+              "factor": 1,
+              "type": "StatusLebenszyklus"
+          },
+          "ascendants": {
+              "childWeight": 0,
+              "parentWeight": 0.7,
+              "threshold": 0,
+              "type": "_taxonomySimilarity"
+          },
+          "cc": {
+              "distance": 3,
+              "factor": 0.95,
+              "maxCombine": 2,
+              "type": "_compoundComponents"
+          },
+          "descendants": {
+              "childWeight": 1,
+              "parentWeight": 0,
+              "threshold": 0,
+              "type": "_taxonomySimilarity"
+          },
+          "doctype": {
+              "distance": 3,
+              "factor": 1,
+              "type": "doctype"
+          },
+          "dokumentenherkunft": {
+              "distance": 3,
+              "factor": 1,
+              "type": "dokumentenherkunft"
+          },
+          "ec": {
+              "factor": 0.95,
+              "type": "_expandCompound"
+          },
+          "product": {
+              "distance": 3,
+              "factor": 1,
+              "type": "product"
+          },
+          "skilllevel": {
+              "distance": 3,
+              "factor": 1,
+              "type": "skilllevel"
+          },
+          "standardTaxonomy": {
+              "childWeight": 0.8,
+              "parentWeight": 0.6,
+              "threshold": 0.2,
+              "type": "_taxonomySimilarity"
+          }
+      },
+      "highlightConfig": {
+          "abstract": {
+              "conceptHighlightMode": "simple",
+              "conceptHighlightTag": "concept",
+              "highlightScript": "iasStandardHighlight",
+              "highlightTag": "hit",
+              "length": 200,
+              "numberOfPassages": 3
+          },
+          "bestPassage": {
+              "conceptHighlightMode": "simple",
+              "conceptHighlightTag": "concept",
+              "highlightScript": "iasStandardHighlight",
+              "highlightTag": "hit",
+              "length": 20,
+              "numberOfPassages": 2
+          },
+          "highlight": {
+              "conceptHighlightMode": "simple",
+              "conceptHighlightTag": "concept",
+              "highlightScript": "iasStandardHighlight",
+              "highlightTag": "hit",
+              "length": 100
+          },
+          "llmPassage": {
+              "highlightScript": "iasHighlight",
+              "length": 1000,
+              "numberOfPassages": 1,
+              "prefix": "",
+              "suffix": ""
+          }
+      },
+      "ignoreStopwordsInHighlight": true,
+      "ignoreStopwordsInImplicitNear": true,
+      "language": [
+          "en",
+          "de"
+      ],
+      "matchingLiterals": false,
+      "maxCount": 20,
+      "maxWildcardExpansions": 99999,
+      "nearDistance": 2,
+      "ranking": {
+          "baseScore": 0.7,
+          "bm25": {
+              "avgDocLen": 500,
+              "b": 0.85,
+              "ignoreStopwords": true,
+              "k1": 1.4,
+              "maxTermsForSimilarRecord": 1000,
+              "normalization": 1,
+              "scoreStretchX": 0.2,
+              "scoreStretchY": 0.9,
+              "termCount1": 10,
+              "termCount2": 12,
+              "termCount3": 15
+          },
+          "distanceRanking": {
+              "halfValueDistance": 5,
+              "ignoreStopwords": true,
+              "orderMalus": 1,
+              "threshold": 0.5,
+              "weight": 50
+          },
+          "metadataBoosting": {
+              "DocumentType": {
+                  "default": 5,
+                  "values": {
+                      "Solution": 0,
+                      "Tree": 10
+                  },
+                  "weight": 50
+              }
+          },
+          "textBoosting": {
+              "Comment_txt": {
+                  "fMiss": 0.8,
+                  "weight": 33
+              },
+              "Content": 33,
+              "Keywords_txt": 66,
+              "Memo_LongText_txt": {
+                  "fMiss": 0.8,
+                  "weight": 33
+              },
+              "Title": {
+                  "fMiss": 0.8,
+                  "weight": 100
+              }
+          }
+      },
+      "requestLogging": false,
+      "roleAttribute": "Roles",
+      "scoreDigits": 10,
+      "termGeneration": {
+          "literalClasses": [],
+          "publicClasses": {
+              "StatusLebenszyklus": {
+                  "class": "StatusLebenszyklus",
+                  "labels": {
+                      "de": "Status Lebenszyklus",
+                      "en": "Lifecycle Status"
+                  },
+                  "valueType": "enumeration"
+              },
+              "doctype": {
+                  "class": "doctype",
+                  "isTaxonomy": true,
+                  "labels": {
+                      "de": "Dokumenttyp",
+                      "en": "Document Type"
+                  },
+                  "taxonomyLevels": 2,
+                  "valueType": "enumeration"
+              },
+              "dokumentenherkunft": {
+                  "class": "dokumentenherkunft",
+                  "labels": {
+                      "de": "Dokumentenherkunft",
+                      "en": "Document Origin"
+                  },
+                  "valueType": "enumeration"
+              },
+              "ese.ExternalLink": {
+                  "class": "ese.ExternalLink",
+                  "labels": {
+                      "de": "Externer Link",
+                      "en": "External link"
+                  },
+                  "valueType": "string"
+              },
+              "pimcore_category": {
+                  "class": "pimcore_category",
+                  "labels": {
+                      "de": "pimcore_category",
+                      "en": "pimcore_category"
+                  },
+                  "valueType": "string"
+              },
+              "pimcore_keywords": {
+                  "class": "pimcore_keywords",
+                  "labels": {
+                      "de": "pimcore_keywords",
+                      "en": "pimcore_keywords"
+                  },
+                  "valueType": "string"
+              },
+              "product": {
+                  "class": "product",
+                  "isTaxonomy": true,
+                  "labels": {
+                      "de": "Produkt",
+                      "en": "Product"
+                  },
+                  "taxonomyLevels": 5,
+                  "valueType": "enumeration"
+              },
+              "skilllevel": {
+                  "class": "skilllevel",
+                  "labels": {
+                      "de": "Access Level",
+                      "en": "Access Level"
+                  },
+                  "valueType": "enumeration"
+              }
+          },
+          "stemmingClasses": [
+              "_all"
+          ]
+      },
+      "threshold": 0.2,
+      "timestamp": "2025-01-17T15:41:41Z",
+      "zeroHitTerms": false
+  },
+  "variant": "documentsearch"
+}
