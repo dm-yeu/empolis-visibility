@@ -5,7 +5,7 @@ import util from 'util';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
 import { config } from './index.js';
-import { getToken, checkApiStatus } from './empolis_admin.js';
+import { getToken } from './empolis_admin.js';
 import { getFileMetadata } from './empolis_ops.js';
 
 /**
@@ -26,17 +26,24 @@ import { getFileMetadata } from './empolis_ops.js';
  * @requires chalk
  */
 export async function fileSearch({ searchTerm, consoleOutput = false }) {
+  logger.debug(`fileSearch() started`);
   try {
-    const API_TOKEN = await getToken();
-    await checkApiStatus(API_TOKEN);
-
-    const searchResults = await vfqSearch({
-      authToken: API_TOKEN,
-      searchTerm: `${config.DATA_SOURCE}/${searchTerm}`,
-      searchAttribute: 'DownloadLink',
+    // Define search query
+    const vfq = {
+      attribute: 'DownloadLink',
+      value: `${config.DATA_SOURCE}/${searchTerm}`,
+    };
+    // Define search query parameters
+    const queryParameters = {
+      maxCount: 1,
       resultAttributes: ['Title', 'FileName', 'DownloadLink'],
-      maxResults: 1,
+    };
+    // Search the Empolis index for the specified file
+    const searchResults = await indexSearch({
+      queryObject: vfq,
+      queryParameters,
     });
+    // If search results are found, return the metadata
     if (searchResults?.records?.length) {
       if (consoleOutput) {
         console.log(
@@ -46,17 +53,18 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       }
       const firstResult = searchResults.records[0];
       const downloadLink = firstResult.DownloadLink;
-      const fileMetadata = await getFileMetadata({ authToken: API_TOKEN, path: downloadLink });
+      const fileMetadata = await getFileMetadata({ path: downloadLink });
       if (consoleOutput) {
         console.log(
-          `\n`+
-          `  Metadata for ${searchTerm}:` +
           `\n` +
-          `${util.inspect(fileMetadata, { depth: null, colors: true })}` +
-          `\n`
+            `  Metadata for ${searchTerm}:` +
+            `\n` +
+            `${util.inspect(fileMetadata, { depth: null, colors: true })}` +
+            `\n`
         );
       }
       return fileMetadata;
+      // If no search results are found, log a message and return null
     } else {
       if (consoleOutput) {
         console.log(
@@ -64,6 +72,9 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
             ` No search results for '${chalk.cyan(searchTerm)}' in the '${config.dataSourceSelection}' data source`
         );
       }
+      logger.info(
+        `No search results for '${searchTerm}' in the '${config.dataSourceSelection}' data source`
+      );
       return null;
     }
   } catch (error) {
@@ -73,130 +84,40 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
 }
 
 /**
- * Function to search the Empolis index using the Natural Language Query (nlq) method against all text attributes.
- * <br>See [nlq seach reference documentation]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/search/lines#search-line-nlq}.
+ * Function to search the Empolis index.
+ * <br>See [index search reference documentation]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/search/request}.
  * @async
- * @function nlqSearch
+ * @function indexSearch
  * @memberof empolisSearch
- * @param {string} authToken - authentication token for API requests
- * @param {string} searchTerm - search term in natural language
- * @param {string} [ searchAttribute = "" ] - attribute to search, default is all text attributes
- * @param {array} [ resultAttributes = null ] - attributes to return in search results, default is all attributes
- * @param {number} [ maxResults = 10 ] - maximum number of search results, default is 10
+ * @param {object} queryObject - search [query object]{@Link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/search/lines}
+ * @param {object} queryParameters - search [query parameters]{@Link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/api/ias/index.html#tag/Search/operation/IasIndexIndexNameSearchPost}
  * @returns {Promise<JSON>} search results
  * @requires got
+ * @requires empolis_admin
  */
-
-export async function nlqSearch({ 
-  authToken, 
-  searchTerm,
-  searchAttribute = "",
-  resultAttributes = null,
-  maxResults = 10,
-}) {
-  logger.debug(`nlqSearch() started`);
-
-  // Validate resultAttributes parameter
-  if (resultAttributes !== null && !Array.isArray(resultAttributes)) {
-    throw new Error(`resultAttributes must be an array of strings or null`);
-  }
-
-  const url = `${config.BASE_URL}/api/ias/${config.IAS_API_VERSION}/index/project1_p/search`;
-
-  // nlq (Natural Language Query)
-  const data = {
-    query: {
-      nlq: `${searchTerm}`,
-      attribute: `${searchAttribute}`,
-    },
-    maxCount: maxResults,
-    resultAttributes,
-  };
-
-  const options = {
-    headers: {
-      Authorization: `Bearer ${authToken}`,
+export async function indexSearch({ queryObject, queryParameters }) {
+  logger.debug(`indexSearch() started`);
+  try {
+    const API_TOKEN = await getToken();
+    // Define got() request options
+    const url = `${config.BASE_URL}/api/ias/${config.IAS_API_VERSION}/index/project1_p/search`;
+    const headers = {
+      Authorization: `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-
-  try {
+    };
+    const data = {
+      query: queryObject,
+      ...queryParameters,
+    };
+    const body = JSON.stringify(data);
+    const options = { headers, body };
+    // Make index search request to Empolis API
     const response = await got.post(url, options);
-    logResponse(response, 'nlqSearch() got response');
+    logResponse(response, 'indexSearch() got.post response');
 
     return JSON.parse(response.body);
   } catch (error) {
-    console.error(`nlqSearch() Error:\n${error}`);
-    logger.error(`nlqSearch() Error:\n${error}`);
-  }
-}
-
-/**
- * Function to search the Empolis index using the Value Filter Query (vfq) method.
- * <br>vfq search queries cannot be made against text attributes (for example 'FileName'). A match will be found only if the search term matches the attribute value completely.
- * <br>See [vfq seach reference documentation]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/en/search/lines#search-line-vfq}.
- * @async
- * @function vfqSearch
- * @memberof empolisSearch
- * @param {string} authToken - authentication token for API requests
- * @param {string} searchTerm - search term in natural language
- * @param {string} [ searchAttribute = "DownloadLink" ] - attribute to search, default is "DownloadLink"
- * @param {array} [ resultAttributes = null ] - attributes to return in search results, default is all attributes
- * @param {number} [ maxResults = 1 ] - maximum number of search results, default is 1
- * @returns {Promise<JSON>} search results
- * @requires got
- */
-
-export async function vfqSearch({
-  authToken,
-  searchTerm,
-  searchAttribute = 'DownloadLink',
-  resultAttributes = null,
-  maxResults = 1,
-}) {
-  logger.debug(`vfqSearch() started`);
-
-  if (searchAttribute === 'FileName') {
-    throw new Error(`FileName attribute not allowed`);
-  }
-
-  // Validate resultAttributes parameter
-  if (resultAttributes !== null && !Array.isArray(resultAttributes)) {
-    throw new Error(`resultAttributes must be an array of strings or null`);
-  }
-
-  // Define got() request options
-  const url = `${config.BASE_URL}/api/ias/${config.IAS_API_VERSION}/index/project1_p/search`;
-  const headers = {
-    Authorization: `Bearer ${authToken}`,
-    'Content-Type': 'application/json',
-  };
-  const data = {
-    query: {
-      attribute: `${searchAttribute}`,
-      value: `${searchTerm}`,
-    },
-    maxCount: maxResults,
-    resultAttributes,
-  };
-  const body = JSON.stringify(data);
-  const options = { headers, body };
-
-  try {
-    // Make vfqSearch request to Empolis API
-    const response = await got.post(url, options);
-    logResponse(response, 'vfqSearch() got.post response');
-
-    return JSON.parse(response.body);
-  } catch (error) {
-    if (error.message === 'FileName attribute not allowed') {
-      logger.error(
-        "The 'FileName' and other TEXT attributes cannot be searched against with the vfq method."
-      );
-    } else {
-      console.error(`vfqSearch() Error:\n${error}`);
-      logger.error(`vfqSearch() Error:\n${error}`);
-    }
+    console.error(`indexSearch() Error:\n${error}`);
+    logger.error(`indexSearch() Error:\n${error}`);
   }
 }
