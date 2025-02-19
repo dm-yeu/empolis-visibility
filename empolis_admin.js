@@ -187,7 +187,11 @@ export async function checkApiStatus() {
       apiName: 'ingest',
       apiVersion: config.INGEST_API_VERSION,
     }),
-    apiOperational({ authToken: API_TOKEN, apiName: 'ias', apiVersion: config.IAS_API_VERSION }),
+    apiOperational({ 
+      authToken: API_TOKEN,
+      apiName: 'ias',
+      apiVersion: config.IAS_API_VERSION
+    }),
     apiOperational({
       authToken: API_TOKEN,
       apiName: 'store',
@@ -218,7 +222,7 @@ export async function checkApiStatus() {
  * @returns {Promise<string>} operational status of the API (true if operational)
  * @requires got
  */
-export async function apiOperational({ authToken, apiName, apiVersion }) {
+async function apiOperational({ authToken, apiName, apiVersion }) {
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
 
   const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`;

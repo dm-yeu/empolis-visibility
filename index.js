@@ -1,10 +1,10 @@
 // Imports
-import { getToken, checkApiStatus } from './empolis_admin.js';
+import { getToken } from './empolis_admin.js';
 import { fileSearch } from './empolis_search.js';
 import { editFileMetadata } from './empolis_ops.js';
 import { loadConfig, getHtmlFiles, readJsonData } from './helpers.js';
 import { createFileIndex } from './index_creation.js';
-import logger, { logPrettyJson } from './logger.js';
+import logger, { configureLogger, logPrettyJson } from './logger.js';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'url';
 import path from 'node:path';
@@ -17,8 +17,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: __dirname + `/.env` });
 
-// Load configuration
-export let config = await loadConfig({ promptUser: true });
+// Initialize basic config for logger
+const initialConfig = await loadConfig({ promptUser: false, testApi: false });
+configureLogger(initialConfig);
+
+// Load full config with user prompt
+export let config = await loadConfig({ promptUser: true, testApi: true });
 logger.debug(`config:\n${config}`);
 
 /**
@@ -44,7 +48,6 @@ async function main() {
     let newOperation = true;
     let fileList = [];
     let indexFile = '';
-    await checkApiStatus();
     while (newOperation) {
       // Create index file for the data source if user selects 'index' or 'update' operation
       if (config.OPERATION === 'index' || config.OPERATION === 'update') {

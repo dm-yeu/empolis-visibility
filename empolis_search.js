@@ -29,9 +29,13 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
   logger.debug(`fileSearch() started`);
   try {
     // Define search query
-    const vfq = {
+    /*const vfq = {
       attribute: 'DownloadLink',
       value: `${config.DATA_SOURCE}/${searchTerm}`,
+    };*/
+    const nlq = {
+      attribute: 'FileName',
+      nlq: searchTerm,
     };
     // Define search query parameters
     const queryParameters = {
@@ -40,7 +44,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
     };
     // Search the Empolis index for the specified file
     const searchResults = await indexSearch({
-      queryObject: vfq,
+      queryObject: nlq,
       queryParameters,
     });
     // If search results are found, return the metadata
@@ -48,7 +52,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       if (consoleOutput) {
         console.log(
           `${chalk.green('√')}` +
-            ` ${chalk.cyan(searchTerm)} found in the '${config.dataSourceSelection}' data source.`
+            ` ${chalk.cyan(searchTerm)} file found in the index.`
         );
       }
       const firstResult = searchResults.records[0];
@@ -69,11 +73,11 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
       if (consoleOutput) {
         console.log(
           `${chalk.red('X')}` +
-            ` No search results for '${chalk.cyan(searchTerm)}' in the '${config.dataSourceSelection}' data source`
+            ` No search results for '${chalk.cyan(searchTerm)}' file in the index.`
         );
       }
       logger.info(
-        `No search results for '${searchTerm}' in the '${config.dataSourceSelection}' data source`
+        `No search results for '${searchTerm}' file in the index.`
       );
       return null;
     }

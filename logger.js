@@ -3,32 +3,32 @@ import winston from 'winston';
 import 'winston-daily-rotate-file';
 import path from 'node:path';
 import util from 'util';
-import { loadConfig } from './helpers.js';
 
-/**
- * Configuration functions
- * @namespace log
- * @memberof module:logger
- */
+// Create a default logger with console transport that will be replaced later
+let logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.timestamp({
+          format: 'YYYY-MM-DD H:mm:ss.SSS',
+        }),
+        winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
+      )
+    })
+  ]
+});
 
 /**
  * Configures and initializes the winston logger with daily rotation and error handling.
- * @async
- * @function initializeLogger
- * @memberof module:logger.log
- * @returns {Promise<winston.Logger>} Winston logger instance
+ * @function configureLogger
+ * @param {Object} config - Configuration object containing LOG_LEVEL and LOG_DIRECTORY
  * @throws Error if logger initialization fails
- * @requires winston
- * @requires winston-daily-rotate-file
- * @requires path
- * @requires helpers
  */
-async function initializeLogger() {
+export function configureLogger(config) {
   try {
-    const config = await loadConfig({ promptUser: false });
     if (config.LOG_LEVEL === 'debug') {
       console.log(
-        `initializeLogger() config:\n${util.inspect(config, { depth: null, colors: false })}`
+        `configureLogger() config:\n${util.inspect(config, { depth: null, colors: false })}`
       );
     }
 
@@ -45,26 +45,18 @@ async function initializeLogger() {
       maxFiles: '7d',
     });
 
-    const logger = winston.createLogger({
-      level: config.LOG_LEVEL,
-      format: winston.format.combine(
-        winston.format.timestamp({
-          format: 'YYYY-MM-DD H:mm:ss.SSS',
-        }),
-        winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
-        winston.format.errors()
-      ),
-      transports: [errorRotateTransport, combinedRotateTransport],
-    });
+    // Clear existing transports and add new ones
+    logger.clear();  // Remove all transports
+    logger.add(errorRotateTransport);
+    logger.add(combinedRotateTransport);
+    logger.level = config.LOG_LEVEL;
 
-    return logger;
   } catch (error) {
-    console.error(`Error initializing logger: ${error.message}\n${error.stack}`);
+    console.error(`Error configuring logger: ${error.message}\n${error.stack}`);
     throw error;
   }
 }
 
-const logger = await initializeLogger();
 export default logger;
 
 /**
@@ -82,7 +74,7 @@ export function logResponse(response, logEntryTitle = 'got() response') {
     ${formattedBody
       .split('\n')
       .map((line) => '  ' + line)
-      .join('\n')}`); // add indentation to response.body
+      .join('\n')}`);
 }
 
 /**
@@ -106,6 +98,6 @@ export function logPrettyJson(jsonObject, logEntryTitle = 'JSON object') {
     ${formattedObject
       .split('\n')
       .map((line) => '  ' + line)
-      .join('\n')}`); // add indentation to object
+      .join('\n')}`);
   return null;
 }

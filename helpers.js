@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import yaml from 'js-yaml';
 import { select } from '@inquirer/prompts';
+import { checkApiStatus } from './empolis_admin.js';
 
 /**
  * Namespace for configuration elements
@@ -22,14 +23,19 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Load configuration from YAML file
+ * <br> Do not use 'logger' here as it is not yet initialized
  * @async
  * @function loadConfig
  * @memberof configuration
  * @param {boolean} [ promptUser = false ] - Prompt user for configuration data
+ * @param {boolean} [ testApi = false ] - Test the API status
  * @returns {Promise<Object>} Parsed configuration object
  */
 
-export async function loadConfig({ promptUser = false }) {
+export async function loadConfig({ 
+  promptUser = false,
+  testApi = false, 
+}) {
   try {
     // Build the absolute path to the config.yaml file
     const configPath = path.join(__dirname, 'config.yaml');
@@ -37,32 +43,14 @@ export async function loadConfig({ promptUser = false }) {
     const fileContents = await fs.readFile(configPath, 'utf8');
     // Parse YAML to JavaScript object
     const config = yaml.load(fileContents);
+    // Check the API status if the OPERATION is not set
+    if ((!config.OPERATION) && (testApi)) await checkApiStatus();
     // Return the configuration object if promptUser is false
     if (!promptUser) return config;
 
-    // Prompt user for data source selection
-    config.dataSourceSelection = await select({
-      message: 'Select the data source:',
-      choices: [
-        { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
-        { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
-      ],
-    });
-    // Configure the data source based on user selection
-    switch (config.dataSourceSelection) {
-      case 'iCube':
-        config.DATA_SOURCE = config.ICUBE_DATA_SOURCE;
-        config.FILE_DIR = config.ICUBE_HELP_DIR;
-        break;
-      case 'DWEZ':
-        config.DATA_SOURCE = config.DWEZ_DATA_SOURCE;
-        config.FILE_DIR = config.DWEZ_HELP_DIR;
-        break;
-    }
-
     // Prompt user to select the operation to perform on the data source
     config.OPERATION = await select({
-      message: 'Select the operation to perform on the data source:',
+      message: 'Select the operation to perform:',
       choices: [
         {
           name: 'Create index file',
@@ -81,6 +69,28 @@ export async function loadConfig({ promptUser = false }) {
         },
       ],
     });
+
+    if (config.OPERATION != 'file_search') {
+      // Prompt user for data source selection
+      config.dataSourceSelection = await select({
+        message: 'Select the data source:',
+        choices: [
+          { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
+          { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
+        ],
+      });
+      // Configure the data source based on user selection
+      switch (config.dataSourceSelection) {
+        case 'iCube':
+          config.DATA_SOURCE = config.ICUBE_DATA_SOURCE;
+          config.FILE_DIR = config.ICUBE_HELP_DIR;
+          break;
+        case 'DWEZ':
+          config.DATA_SOURCE = config.DWEZ_DATA_SOURCE;
+          config.FILE_DIR = config.DWEZ_HELP_DIR;
+          break;
+      }
+    }
 
     return config;
   } catch (error) {
