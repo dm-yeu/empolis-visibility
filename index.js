@@ -44,6 +44,7 @@ async function main() {
     let newOperation = true;
     let fileList = [];
     let indexFile = '';
+    await checkApiStatus();
     while (newOperation) {
       // Create index file for the data source if user selects 'index' or 'update' operation
       if (config.OPERATION === 'index' || config.OPERATION === 'update') {
@@ -155,7 +156,6 @@ async function createUpdateIndexFile() {
  */
 async function updateCloudMetadata({ fileList, indexFile }) {
   const API_TOKEN = await getToken();
-  await checkApiStatus(API_TOKEN);
   // Load the full index of files from the index file
   const index = await readJsonData(indexFile);
   // Update the metadata for each file in the index
