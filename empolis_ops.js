@@ -4,6 +4,7 @@ import isJSON from 'is-json';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
 import { config } from './index.js';
+import { getToken } from './empolis_admin.js';
 
 /**
  * Namespace for all elements related to Empolis File or Record operations
@@ -18,33 +19,21 @@ const FILE_PATH_ERROR = "Metadata must contain 'FilePath'";
  * @async
  * @function getFileMetadata
  * @memberof empolisOps
- * @param {string} authToken  - authentication token for API requests
  * @param {string} path - file path ('DownloadLink' attribute)
  * @returns {Promise<JSON>} file metadata
  * @requires got
  */
 
-export async function getFileMetadata({ authToken, path }) {
+export async function getFileMetadata({ path }) {
   logger.debug(`getFileMetadata() started`);
-
-  // Define got() request options
-  const url = `${config.BASE_URL}/api/store/${config.STORE_API_VERSION}/file/${path}?metadata`;
-  const method = 'GET';
-  const headers = { Authorization: `Bearer ${authToken}` };
-  const options = { url, method, headers };
-
   try {
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
-    logResponse(response, 'getFileMetadata() got response');
+    const API_TOKEN = await getToken();
+    const url = `${config.BASE_URL}/api/store/${config.STORE_API_VERSION}/file/${path}?metadata`;
+    const headers = { Authorization: `Bearer ${API_TOKEN}` };
+    const options = { headers };
 
+    const response = await got.get(url, options);
+    logResponse(response, 'getFileMetadata() got response');
     return JSON.parse(response.body);
   } catch (error) {
     console.error(`getFileMetadata() Error:\n${error}`);
