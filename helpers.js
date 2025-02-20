@@ -77,6 +77,16 @@ export async function truncateFile(filePath) {
   }
 }
 
+/**
+ * Read JSON data from a file, parse it, and return the data.
+ * @async
+ * @function readJsonData
+ * @memberof fileOperations
+ * @param {string} filePath - path of the JSON file
+ * @returns {Promise<object>} JSON data from the file
+ * @requires fs.readFile
+ * @requires logger
+ */
 export async function readJsonData(filePath) {
   try {
     const data = await fs.readFile(filePath, 'utf8');
