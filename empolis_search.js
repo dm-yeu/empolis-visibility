@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import util from 'util';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
-import { config } from './index.js';
+import { getConfig } from './config.js'
 import { getToken } from './empolis_admin.js';
 import { getFileMetadata } from './empolis_ops.js';
 
@@ -101,6 +101,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
  */
 export async function indexSearch({ queryObject, queryParameters }) {
   logger.debug(`indexSearch() started`);
+  const config = getConfig();
   try {
     const API_TOKEN = await getToken();
     // Define got() request options

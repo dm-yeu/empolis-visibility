@@ -3,7 +3,7 @@ import got from 'got';
 import isJSON from 'is-json';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
-import { config } from './index.js';
+import { getConfig } from './config.js'
 import { getToken } from './empolis_admin.js';
 
 /**
@@ -26,6 +26,7 @@ const FILE_PATH_ERROR = "Metadata must contain 'FilePath'";
 
 export async function getFileMetadata({ path }) {
   logger.debug(`getFileMetadata() started`);
+  const config = getConfig();
   try {
     const API_TOKEN = await getToken();
     const url = `${config.BASE_URL}/api/store/${config.STORE_API_VERSION}/file/${path}?metadata`;
@@ -56,6 +57,7 @@ export async function getFileMetadata({ path }) {
 
 export async function editFileMetadata({ authToken, newMetadata }) {
   logger.debug(`editFileMetadata() started`);
+  const config = getConfig();
 
   if (!newMetadata?.FilePath?.length) {
     throw new Error(FILE_PATH_ERROR);
@@ -112,6 +114,7 @@ export async function editFileMetadata({ authToken, newMetadata }) {
 
 export async function getRecord({ authToken, recordId }) {
   logger.debug(`getRecord() started`);
+  const config = getConfig();
 
   const endpoint = `/api/ias/${config.IAS_API_VERSION}/index/project1_p/record/${recordId}`;
   const url = config.BASE_URL + endpoint;
@@ -160,6 +163,7 @@ export async function getRecord({ authToken, recordId }) {
 
 export async function updateRecord({ authToken, recordId, updatedRecord }) {
   logger.debug(`updateRecord() started`);
+  const config = getConfig();
 
   const endpoint = `/api/ias/${config.IAS_API_VERSION}/index/project1_p/record`;
   const url = config.BASE_URL + endpoint;

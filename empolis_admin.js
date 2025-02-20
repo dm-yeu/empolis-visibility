@@ -2,7 +2,7 @@
 import got from 'got';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
-import { config } from './index.js';
+import { getConfig } from './config.js';
 import chalk from 'chalk';
 
 /**
@@ -42,7 +42,7 @@ let tokenCache = {
  */
 export async function getToken() {
   logger.debug(`getToken() started`);
-
+  const config = getConfig();
   const currentTime = Date.now();
 
   // Check if we have a valid cached access token
@@ -145,7 +145,7 @@ export async function getToken() {
  */
 async function refreshAccessToken(refreshToken) {
   logger.debug('Attempting to refresh access token');
-
+  const config = getConfig();
   const { CLIENT_ID, CLIENT_SECRET } = process.env;
   const url = `${config.BASE_URL}/oauth2/token`;
 
@@ -179,6 +179,7 @@ async function refreshAccessToken(refreshToken) {
  */
 export async function checkApiStatus() {
   logger.debug(`checkApiStatus() started`);
+  const config = getConfig();
   const API_TOKEN = await getToken();
 
   const apiChecks = [
@@ -224,7 +225,7 @@ export async function checkApiStatus() {
  */
 async function apiOperational({ authToken, apiName, apiVersion }) {
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
-
+  const config = getConfig();
   const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`;
 
   // Define got() request options
