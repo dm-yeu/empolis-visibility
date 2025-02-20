@@ -55,7 +55,7 @@ export async function getFileMetadata({ path }) {
  * @requires got
  */
 
-export async function editFileMetadata({ authToken, newMetadata }) {
+export async function editFileMetadata({ newMetadata }) {
   logger.debug(`editFileMetadata() started`);
   const config = getConfig();
 
@@ -63,28 +63,21 @@ export async function editFileMetadata({ authToken, newMetadata }) {
     throw new Error(FILE_PATH_ERROR);
   }
 
+  const API_TOKEN = await getToken();
+
   // Define got() request options
   const url = `${config.BASE_URL}/api/ingest/${config.INGEST_API_VERSION}/metadata/environment/project1_p`;
-  const method = 'POST';
   const headers = {
-    Authorization: `Bearer ${authToken}`,
+    Authorization: `Bearer ${API_TOKEN}`,
     'Content-Type': 'application/json',
   };
   const body = JSON.stringify(newMetadata);
-  const options = { url, method, headers, body };
+  const options = { headers, body };
 
   try {
     // Make update request to Empolis API
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
-    logResponse(response, 'editFileMetadata() got response');
+    const response = await got.post(url, options);
+    logResponse(response, 'editFileMetadata() got.post response');
 
     // Return the response statusCode
     return response.statusCode;

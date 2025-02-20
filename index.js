@@ -188,7 +188,7 @@ async function processFile(authToken, dataObject) {
   }
   logPrettyJson(newMetadata, 'newMetadata');
 
-  const editMetadataResponse = await editFileMetadata({ authToken, newMetadata });
+  const editMetadataResponse = await editFileMetadata({ newMetadata });
   if (editMetadataResponse === 202) {
     logger.info(`${dataObject.filename} metadata modified successfully`);
   } else {
