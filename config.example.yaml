@@ -1,5 +1,14 @@
 # config.yaml
 
+# Log Directory
+## Empolis Box
+##LOG_DIRECTORY: 'F:/Empolis-DataSource/_logs'
+## Local for Test
+LOG_DIRECTORY: 'C:/temp/test/logs'
+
+# Log Level
+LOG_LEVEL: 'info'
+
 # Base URL for Empolis APIs
 BASE_URL: 'https://yaskawa2.esc-eu-central-1.empolisservices.com'
 
@@ -13,31 +22,62 @@ IAS_API_VERSION: '4.5'
 # Empolis STORE API Version to Use
 STORE_API_VERSION: '3.0'
 # Empolis Expert Knowledge API Version to Use
-SERVICE-KNOWLEDGE_API_VERSION: '1.0'
+EXPERT_KNOWLEDGE_API_VERSION: '1.0'
 
-# iCube Help Files Directory
-## Empolis Box
-##ICUBE_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Motion Controller/iCube Engineer'
-## Local for Test
+# Data Source Configuration
+
+EMPOLIS_BOX_ROOT: 'environment/project1_p/documents'
+
+## iCube Help Files
+### Empolis Box
+#ICUBE_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Motion Controller/iCube Engineer'
+### Local for Test
 ICUBE_HELP_DIR: 'C:/temp/test/icube'
+### Storage Location in Empolis
+ICUBE_SOURCE: '1719926565798'
+ICUBE_PATH: 'D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer'
 
-# iCube Help Files Storage Location in Empolis
-ICUBE_DATA_SOURCE: 'environment/project1_p/documents/1719926565798/D%3A/Empolis-DataSource/Help%20Files/Motion%20Controller/iCube%20Engineer'
-
-# DWEZ Help Files Directory
-## Empolis Box
-##DWEZ_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Drives/DriveWorks EZ'
-## Local for Test
+## DWEZ Help Files
+### Empolis Box
+#DWEZ_HELP_DIR: 'F:/Empolis-DataSource/Help Files/Drives/DriveWorks EZ'
+### Local for Test
 DWEZ_HELP_DIR: 'C:/temp/test/dwez'
+### Storage Location in Empolis
+DWEZ_SOURCE: '1731422888439'
+DWEZ_PATH: 'D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ'
 
-# DWEZ Help Files Storage Location in Empolis
-DWEZ_DATA_SOURCE: 'environment/project1_p/documents/1731422888439/D%3A/Empolis-DataSource/Help%20Files/Drives/DriveWorks%20EZ'
+## YEC (V) Technical Information Database
+### Empolis Box
+#YTECH_DATABASE_DIR: 'F:/Empolis-DataSource/YEC/(V) Technical Information Database'
+### Local for Test
+YTECH_DATABASE_DIR: 'c:/temp/test/YEC/vtech'
+### Storage Location in Empolis
+YTECH_SOURCE: '1708510165178'
+YTECH_PATH: 'D%3A/Empolis-DataSource/YEC/(V)%20Technical%20Information%20Database'
 
-# Log Directory
-## Empolis Box
-##LOG_DIRECTORY: 'F:/Empolis-DataSource/_logs'
-## Local for Test
-LOG_DIRECTORY: 'C:/temp/test/logs'
+## YEC (V) Application Know-How Database
+### Empolis Box
+#YAPP_DATABASE_DIR: 'F:/Empolis-DataSource/YEC/(V) Application Know-how'
+### Local for Test
+YAPP_DATABASE_DIR: 'c:/temp/test/YEC/vapp'
+### Storage Location in Empolis
+YAPP_SOURCE: '1708606711446'
+YAPP_PATH: 'D%3A/Empolis-DataSource/YEC/(V)%20Application%20Know-how'
 
-# Log Level
-LOG_LEVEL: 'info'
+## ELO DMC Knowledge Base
+### Empolis Box
+#ELO_KB_DIR: 'F:/Empolis-DataSource/ELO KB/Public'
+### Local for Test
+ELO_KB_DIR: 'C:/temp/test/ELO/Public'
+### Storage Location in Empolis
+ELO_KB_SOURCE: '1711445646905'
+ELO_KB_PATH: 'D%3A/Empolis-DataSource/ELO%20KB/Public'
+
+## ELO DMC Confidential Knowledge Base
+### Empolis Box
+#ELO_KBX_DIR: 'F:/Empolis-DataSource/ELO KB/Confidential'
+### Local for Test
+ELO_KBX_DIR: 'C:/temp/test/ELO/Confidential'
+### Storage Location in Empolis
+ELO_KBX_SOURCE: '1711446747472'
+ELO_KBX_PATH: 'D%3A/Empolis-DataSource/ELO%20KB/Confidential'

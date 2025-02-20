@@ -85,18 +85,24 @@ export async function loadConfig({ promptUser = false, testApi = false } = {}) {
         choices: [
           { name: 'iCube', value: 'iCube', description: 'Help files for iCube Engineer' },
           { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
+          { name: 'ELO KB Public', value: 'ELO_KB', description: 'ELO DMC Knowledge Base (Public)'}
         ],
       });
 
+      loadedConfig.DATA_SOURCE = loadedConfig.EMPOLIS_BOX_ROOT;
       // Configure the data source based on user selection
       switch (loadedConfig.dataSourceSelection) {
         case 'iCube':
-          loadedConfig.DATA_SOURCE = loadedConfig.ICUBE_DATA_SOURCE;
+          loadedConfig.DATA_SOURCE += `/${loadedConfig.ICUBE_SOURCE}/${loadedConfig.ICUBE_PATH}`;
           loadedConfig.FILE_DIR = loadedConfig.ICUBE_HELP_DIR;
           break;
         case 'DWEZ':
-          loadedConfig.DATA_SOURCE = loadedConfig.DWEZ_DATA_SOURCE;
+          loadedConfig.DATA_SOURCE += `/${loadedConfig.DWEZ_SOURCE}/${loadedConfig.DWEZ_PATH}`;
           loadedConfig.FILE_DIR = loadedConfig.DWEZ_HELP_DIR;
+          break;
+        case 'ELO_KB':
+          loadedConfig.DATA_SOURCE += `/${loadedConfig.ELO_KB_SOURCE}/${loadedConfig.ELO_KB_PATH}`;
+          loadedConfig.FILE_DIR = loadedConfig.ELO_KB_DIR;
           break;
       }
     }
