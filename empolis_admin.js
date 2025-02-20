@@ -185,10 +185,10 @@ export async function checkApiStatus() {
       apiName: 'ingest',
       apiVersion: config.INGEST_API_VERSION,
     }),
-    apiOperational({ 
+    apiOperational({
       authToken: API_TOKEN,
       apiName: 'ias',
-      apiVersion: config.IAS_API_VERSION
+      apiVersion: config.IAS_API_VERSION,
     }),
     apiOperational({
       authToken: API_TOKEN,

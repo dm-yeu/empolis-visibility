@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import util from 'util';
 import logger from './logger.js';
 import { logResponse } from './logger.js';
-import { getConfig } from './config.js'
+import { getConfig } from './config.js';
 import { getToken } from './empolis_admin.js';
 import { getFileMetadata } from './empolis_ops.js';
 
@@ -50,10 +50,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
     // If search results are found, return the metadata
     if (searchResults?.records?.length) {
       if (consoleOutput) {
-        console.log(
-          `${chalk.green('√')}` +
-            ` ${chalk.cyan(searchTerm)} file found in the index.`
-        );
+        console.log(`${chalk.green('√')}` + ` ${chalk.cyan(searchTerm)} file found in the index.`);
       }
       const firstResult = searchResults.records[0];
       const downloadLink = firstResult.DownloadLink;
@@ -76,9 +73,7 @@ export async function fileSearch({ searchTerm, consoleOutput = false }) {
             ` No search results for '${chalk.cyan(searchTerm)}' file in the index.`
         );
       }
-      logger.info(
-        `No search results for '${searchTerm}' file in the index.`
-      );
+      logger.info(`No search results for '${searchTerm}' file in the index.`);
       return null;
     }
   } catch (error) {

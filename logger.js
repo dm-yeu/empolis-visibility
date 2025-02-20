@@ -18,9 +18,9 @@ let logger = winston.createLogger({
   format: logFormat,
   transports: [
     new winston.transports.Console({
-      format: logFormat
-    })
-  ]
+      format: logFormat,
+    }),
+  ],
 });
 
 /**
@@ -38,13 +38,13 @@ export function configureLogger(config) {
       datePattern: 'YYYY-MM-DD',
       maxFiles: '7d',
       level: 'error',
-      format: logFormat
+      format: logFormat,
     });
     const combinedRotateTransport = new winston.transports.DailyRotateFile({
       filename: path.join(config.LOG_DIRECTORY, 'empolis-visibility_%DATE%_combined.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: '7d',
-      format: logFormat
+      format: logFormat,
     });
 
     // Clear existing transports
@@ -60,7 +60,6 @@ export function configureLogger(config) {
     // Log the initial configuration to the file
     logger.info(`Logger configured with level: ${config.LOG_LEVEL}`);
     logger.info(`Log directory: ${config.LOG_DIRECTORY}`);
-
   } catch (error) {
     console.error(`Error configuring logger: ${error.message}\n${error.stack}`);
     throw error;
@@ -75,11 +74,13 @@ export function verifyLoggerConfiguration() {
   const transports = logger.transports;
   logger.info('Verifying logger configuration');
   logger.info(`Number of active transports: ${transports.length}`);
-  
+
   transports.forEach((transport, index) => {
-    logger.info(`Transport ${index + 1}: ${transport.name}, ` +
-      `level: ${transport.level}, ` +
-      `filename: ${transport.filename || 'N/A'}`);
+    logger.info(
+      `Transport ${index + 1}: ${transport.name}, ` +
+        `level: ${transport.level}, ` +
+        `filename: ${transport.filename || 'N/A'}`
+    );
   });
 }
 

@@ -41,10 +41,7 @@ export function getConfig() {
  * @param {boolean} [options.testApi=false] - Test the API status
  * @returns {Promise<Object>} Parsed configuration object
  */
-export async function loadConfig({ 
-  promptUser = false,
-  testApi = false, 
-} = {}) {
+export async function loadConfig({ promptUser = false, testApi = false } = {}) {
   try {
     // Build the absolute path to the config.yaml file
     const configPath = path.join(__dirname, 'config.yaml');
@@ -52,10 +49,10 @@ export async function loadConfig({
     const fileContents = await fs.readFile(configPath, 'utf8');
     // Parse YAML to JavaScript object
     const loadedConfig = yaml.load(fileContents);
-    
+
     // Check the API status if the OPERATION is not set
-    if ((!loadedConfig.OPERATION) && (testApi)) await checkApiStatus();
-    
+    if (!loadedConfig.OPERATION && testApi) await checkApiStatus();
+
     // Return the configuration object if promptUser is false
     if (!promptUser) return loadedConfig;
 
@@ -90,7 +87,7 @@ export async function loadConfig({
           { name: 'DWEZ', value: 'DWEZ', description: 'Help files for DriveWorks EZ' },
         ],
       });
-      
+
       // Configure the data source based on user selection
       switch (loadedConfig.dataSourceSelection) {
         case 'iCube':
