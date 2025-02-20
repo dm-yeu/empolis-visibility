@@ -5,7 +5,7 @@ import { confirm } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { getConfig } from './config.js';
 import logger from './logger.js';
-import { fileExists, getHtmlFiles, truncateFile } from './helpers.js';
+import { fileExists, getFilesByExtensions, truncateFile } from './helpers.js';
 
 /**
  * Namespace for functions used to extract text from HTML files and create a file index
@@ -40,12 +40,12 @@ export async function createUpdateIndexFile() {
       throw new Error('Operation cancelled');
     }
 
-    const fileList = await getHtmlFiles(config.FILE_DIR);
+    const fileList = await getFilesByExtensions(config.FILE_DIR);
     console.log(
-      `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
+      `  Found ${chalk.cyan(fileList.length)} files in data source directory. Creating index file...`
     );
     logger.info(
-      `Found ${fileList.length} HTML files in data source directory. Creating index file.`
+      `Found ${fileList.length} files in data source directory. Creating index file.`
     );
     const indexFile = await createFileIndex({
       directoryPath: config.FILE_DIR,
@@ -105,9 +105,19 @@ export async function createFileIndex({ directoryPath, fileList }) {
     }
 
     for (const file of fileList) {
+      let newEntry = {};
       const filePath = path.join(directoryPath, file);
-      const titleAndBreadcrumbs = await extractTitleAndBreadcrumbs(filePath);
-      await writeIndexFile({ newEntry: titleAndBreadcrumbs, indexFilePath: indexFile });
+      const fileExtension = path.extname(filePath).toLowerCase();
+      if (fileExtension === '.html' || fileExtension === '.htm') {
+        const titleAndBreadcrumbs = await extractTitleAndBreadcrumbs(filePath);
+        newEntry = { ...titleAndBreadcrumbs };
+      } else {
+        newEntry = { 
+          filename: path.basename(filePath),
+          title: path.basename(filePath, path.extname(filePath)),
+        };
+      }
+      await writeIndexFile({ newEntry, indexFilePath: indexFile });
     }
 
     return indexFile;
@@ -137,7 +147,8 @@ export async function extractTitleAndBreadcrumbs(htmlFilePath) {
     // Try to get title from <title> tag first, then fall back to Heading_2
     let title = $('title').text().trim();
     if (!title) title = $('.Heading_2').text().trim();
-    if (!title) title = 'Untitled';
+    // Set title as filename without extension if no title found
+    if (!title) title = path.basename(htmlFilePath, path.extname(htmlFilePath));
 
     const breadcrumbs = $('.WebWorks_Breadcrumbs')
       .text()
