@@ -3,8 +3,8 @@ import { loadConfig, setConfig, getConfig } from './config.js';
 import { getToken } from './empolis_admin.js';
 import { fileSearch } from './empolis_search.js';
 import { editFileMetadata } from './empolis_ops.js';
-import { getHtmlFiles, readJsonData } from './helpers.js';
-import { createFileIndex } from './index_creation.js';
+import { readJsonData } from './helpers.js';
+import { createUpdateIndexFile } from './index_creation.js';
 import logger, { configureLogger, logPrettyJson } from './logger.js';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'url';
@@ -94,63 +94,6 @@ async function main() {
       `Total execution time: ${chalk.cyan(executionTime.toFixed(2))} seconds.` +
         ` Logs can be found in ${chalk.cyan(logger.transports[0].dirname)}.`
     );
-  }
-}
-
-/**
- * Create or update an index file with all source files contained in the original data source
- * @async
- * @function createUpdateIndexFile
- * @memberof fileIndex
- * @requires confirm
- * @requires helpers
- * @requires index_creation
- * @returns {Promise<Object>} Object containing the list of files as an array, and the index file path
- */
-async function createUpdateIndexFile() {
-  try {
-    const config = getConfig();
-    // Prompt user to confirm the directory for the source files of the data source
-    config.OK = await confirm({
-      message: `The directory for the files of data source '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
-    });
-
-    // Throw error if user cancels the operation due to incorrect configuration
-    if (!config.OK) {
-      logger.info(`User cancelled the operation due to configuration errors`);
-      console.log(
-        `${chalk.red('X')}` +
-          ` Operation cancelled. Check configuration in ${chalk.cyan('./config.yaml')}.`
-      );
-      throw new Error('Operation cancelled');
-    }
-
-    const fileList = await getHtmlFiles(config.FILE_DIR);
-    console.log(
-      `  Found ${chalk.cyan(fileList.length)} HTML files in data source directory. Creating index file...`
-    );
-    logger.info(
-      `Found ${fileList.length} HTML files in data source directory. Creating index file.`
-    );
-    const indexFile = await createFileIndex({
-      directoryPath: config.FILE_DIR,
-      fileList,
-    });
-    console.log(
-      `${chalk.green('√')}` +
-        ` Index file for '${config.dataSourceSelection}' source data created at ${chalk.cyan(indexFile)}`
-    );
-    logger.info(
-      `Index file for '${config.dataSourceSelection}' source data created at ${indexFile}`
-    );
-    return { fileList, indexFile };
-  } catch (error) {
-    if (error.message === 'Operation cancelled') {
-      return { fileList: [], indexFile: '' };
-    } else {
-      logger.error(`createUpdateIndexFile() Error:\n${error}`);
-      throw new Error(`Failed to create index file: ${error.message}`);
-    }
   }
 }
 
