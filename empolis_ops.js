@@ -1,10 +1,12 @@
 // Imports
 import got from 'got';
 import isJSON from 'is-json';
-import logger from './logger.js';
-import { logResponse } from './logger.js';
+import chalk from 'chalk';
+import logger, { logPrettyJson, logResponse } from './logger.js';
+import { readJsonData } from './helpers.js';
 import { getConfig } from './config.js'
 import { getToken } from './empolis_admin.js';
+import { fileSearch } from './empolis_search.js';
 
 /**
  * Namespace for all elements related to Empolis File or Record operations
@@ -23,7 +25,6 @@ const FILE_PATH_ERROR = "Metadata must contain 'FilePath'";
  * @returns {Promise<JSON>} file metadata
  * @requires got
  */
-
 export async function getFileMetadata({ path }) {
   logger.debug(`getFileMetadata() started`);
   const config = getConfig();
@@ -39,6 +40,101 @@ export async function getFileMetadata({ path }) {
   } catch (error) {
     console.error(`getFileMetadata() Error:\n${error}`);
     logger.error(`getFileMetadata() Error:\n${error}`);
+  }
+}
+
+/**
+ * Update the metadata of files in the Empolis cloud with information from the index file
+ * @async
+ * @function updateCloudMetadata
+ * @memberof empolis_ops
+ * @param {Array} fileList - list of filenames to update metadata for
+ * @param {string} indexFile - path of the index file containing metadata
+ * @requires empolis_admin
+ * @returns {Promise<null>} null
+ */
+export async function updateCloudMetadata({ fileList, indexFile }) {
+  const config = getConfig();
+  // Load the full index of files from the index file
+  const index = await readJsonData(indexFile);
+  // Update the metadata for each file in the index
+  console.log(`  Updating the metadata of ${chalk.cyan(fileList.length)} files...`);
+  logger.info(`Updating the metadata of ${fileList.length} files...`);
+  for (const file of fileList) {
+    const fileIndex = index.findIndex((obj) => obj.filename === file);
+    const fileData = index[fileIndex];
+    await processFile({ fileData });
+  }
+  console.log(
+    `${chalk.green('√')}` +
+      ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
+  logger.info(
+    `Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
+  return null;
+}
+
+/**
+ * Function to modify the metadata of a file via the Empolis INGEST API
+ * <br> Only modifies metadata with editFileMetadata() if it does not have the correct value already
+ * @async
+ * @function processFile
+ * @param {string} authToken - authentication token for API requests
+ * @param {string} file - filename of the file to process
+ * @param {string} htmlTitle - title extracted from the HTML file
+ * @requires ./empolis_functions.js
+ * @requires ./helpers.js
+ * @returns nothing
+ */
+async function processFile({ dataObject }) {
+  logger.info(`Processing ${dataObject.filename}`);
+  logger.debug(`dataObject: ${JSON.stringify(dataObject)}`);
+
+  // Search for file in the user selected data source to get the current metadata
+  const fileMetadata = await fileSearch({ searchTerm: dataObject.filename, consoleOutput: false });
+
+  let newKeywords = '';
+  if (dataObject.breadcrumbs) {
+    for (const keyword of dataObject.breadcrumbs) {
+      newKeywords = newKeywords + keyword + '; ';
+    }
+    newKeywords = newKeywords.trim();
+  }
+  // Check if 'Title' and 'Keywords' are already correct
+  if (fileMetadata.Title && dataObject.title) {
+    if (fileMetadata.Title.toLowerCase() === dataObject.title.toLowerCase()) {
+      logger.info(`${dataObject.filename} already has the correct title`);
+      // Return if keywords and title already match
+      if (fileMetadata.Keywords_txt) {
+        if (fileMetadata.Keywords_txt.toLowerCase() === newKeywords.toLowerCase()) {
+          logger.info(
+            `${dataObject.filename} already has the correct title and keywords, metadata will not be updated`
+          );
+          return;
+        }
+      }
+      // Return if title matches, entry has no keywords, and there are no new keywords to be added
+      else if (newKeywords.length === 0) {
+        logger.info(
+          `Keywords for ${dataObject.filename} do not exist and title is correct, metadata will not be updated`
+        );
+        return;
+      }
+    }
+  }
+  // Build new metadata object with Title and optional Keywords
+  let newMetadata = { ...fileMetadata, Title: dataObject.title };
+  if (newKeywords.length > 0) {
+    newMetadata = { ...newMetadata, Keywords_txt: newKeywords };
+  }
+  logPrettyJson(newMetadata, 'newMetadata');
+
+  const editMetadataResponse = await editFileMetadata({ newMetadata });
+  if (editMetadataResponse === 202) {
+    logger.info(`${dataObject.filename} metadata modified successfully`);
+  } else {
+    logger.error(`Failed to modify metadata for ${dataObject.filename}`);
   }
 }
 
