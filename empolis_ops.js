@@ -1,6 +1,7 @@
 // Imports
 import got from 'got';
 import chalk from 'chalk';
+import util from 'util';
 import logger, { logPrettyJson, logResponse } from './logger.js';
 import { readJsonData } from './helpers.js';
 import { getConfig } from './config.js'
@@ -53,16 +54,24 @@ export async function getFileMetadata({ path }) {
  * @returns {Promise<null>} null
  */
 export async function updateCloudMetadata({ fileList, indexFile }) {
+  logger.debug(`updateCloudMetadata() started`);
   const config = getConfig();
   // Load the full index of files from the index file
   const index = await readJsonData(indexFile);
+  logger.debug(`index: \n${util.inspect(index, { depth: null, colors: false })}`);
   // Update the metadata for each file in the index
   console.log(`  Updating the metadata of ${chalk.cyan(fileList.length)} files...`);
   logger.info(`Updating the metadata of ${fileList.length} files...`);
+  logger.debug(`fileList: \n${util.inspect(fileList, { depth: null, colors: false })}`);
   for (const file of fileList) {
     const fileIndex = index.findIndex((obj) => obj.filename === file);
+    if (fileIndex === -1) {
+      logger.error(`File '${file}' not found in index`);
+      continue;
+    }
     const fileData = index[fileIndex];
-    await processFile({ fileData });
+    logger.debug(`Processing fileData: \n${util.inspect(fileData, { depth: null, colors: false })}`);
+    await processFile({ dataObject: fileData });
   }
   console.log(
     `${chalk.green('√')}` +
@@ -79,15 +88,15 @@ export async function updateCloudMetadata({ fileList, indexFile }) {
  * <br> Only modifies metadata with editFileMetadata() if it does not have the correct value already
  * @async
  * @function processFile
- * @param {string} file - filename of the file to process
- * @param {string} htmlTitle - title extracted from the HTML file
+ * @memberof empolisOps
+ * @param {object} dataObject - object containing the relevant file properties and metadata
  * @requires ./empolis_functions.js
  * @requires ./helpers.js
  * @returns nothing
  */
 async function processFile({ dataObject }) {
-  logger.info(`Processing ${dataObject.filename}`);
-  logger.debug(`dataObject: ${JSON.stringify(dataObject)}`);
+  logger.info(`processFile() started. Processing ${dataObject.filename}`);
+  logger.debug(`dataObject: ${util.inspect(dataObject, { depth: null, colors: false })}`);
 
   // Search for file in the user selected data source to get the current metadata
   const fileMetadata = await fileSearch({ searchTerm: dataObject.filename, consoleOutput: false });
