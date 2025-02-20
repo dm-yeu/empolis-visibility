@@ -1,9 +1,12 @@
 // Imports
 import got from 'got';
-import isJSON from 'is-json';
-import logger from './logger.js';
-import { logResponse } from './logger.js';
-import { config } from './index.js';
+import chalk from 'chalk';
+import util from 'util';
+import logger, { logPrettyJson, logResponse } from './logger.js';
+import { readJsonData } from './helpers.js';
+import { getConfig } from './config.js';
+import { getToken } from './empolis_admin.js';
+import { fileSearch } from './empolis_search.js';
 
 /**
  * Namespace for all elements related to Empolis File or Record operations
@@ -18,37 +21,129 @@ const FILE_PATH_ERROR = "Metadata must contain 'FilePath'";
  * @async
  * @function getFileMetadata
  * @memberof empolisOps
- * @param {string} authToken  - authentication token for API requests
  * @param {string} path - file path ('DownloadLink' attribute)
  * @returns {Promise<JSON>} file metadata
  * @requires got
  */
-
-export async function getFileMetadata({ authToken, path }) {
+export async function getFileMetadata({ path }) {
   logger.debug(`getFileMetadata() started`);
-
-  // Define got() request options
-  const url = `${config.BASE_URL}/api/store/${config.STORE_API_VERSION}/file/${path}?metadata`;
-  const method = 'GET';
-  const headers = { Authorization: `Bearer ${authToken}` };
-  const options = { url, method, headers };
-
+  const config = getConfig();
   try {
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
-    logResponse(response, 'getFileMetadata() got response');
+    const API_TOKEN = await getToken();
+    const url = `${config.BASE_URL}/api/store/${config.STORE_API_VERSION}/file/${path}?metadata`;
+    const headers = { Authorization: `Bearer ${API_TOKEN}` };
+    const options = { headers };
 
+    const response = await got.get(url, options);
+    logResponse(response, 'getFileMetadata() got response');
     return JSON.parse(response.body);
   } catch (error) {
     console.error(`getFileMetadata() Error:\n${error}`);
     logger.error(`getFileMetadata() Error:\n${error}`);
+  }
+}
+
+/**
+ * Update the metadata of files in the Empolis cloud with information from the index file
+ * @async
+ * @function updateCloudMetadata
+ * @memberof empolis_ops
+ * @param {Array} fileList - list of filenames to update metadata for
+ * @param {string} indexFile - path of the index file containing metadata
+ * @requires empolis_admin
+ * @returns {Promise<null>} null
+ */
+export async function updateCloudMetadata({ fileList, indexFile }) {
+  logger.debug(`updateCloudMetadata() started`);
+  const config = getConfig();
+  // Load the full index of files from the index file
+  const index = await readJsonData(indexFile);
+  logger.debug(`index: \n${util.inspect(index, { depth: null, colors: false })}`);
+  // Update the metadata for each file in the index
+  console.log(`  Updating the metadata of ${chalk.cyan(fileList.length)} files...`);
+  logger.info(`Updating the metadata of ${fileList.length} files...`);
+  logger.debug(`fileList: \n${util.inspect(fileList, { depth: null, colors: false })}`);
+  for (const file of fileList) {
+    const fileIndex = index.findIndex((obj) => obj.filename === file);
+    if (fileIndex === -1) {
+      logger.error(`File '${file}' not found in index`);
+      continue;
+    }
+    const fileData = index[fileIndex];
+    logger.debug(
+      `Processing fileData: \n${util.inspect(fileData, { depth: null, colors: false })}`
+    );
+    await processFile({ dataObject: fileData });
+  }
+  console.log(
+    `${chalk.green('√')}` +
+      ` Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
+  logger.info(
+    `Completed metadata update operation for '${config.dataSourceSelection}' data source`
+  );
+  return null;
+}
+
+/**
+ * Function to modify the metadata of a file via the Empolis INGEST API
+ * <br> Only modifies metadata with editFileMetadata() if it does not have the correct value already
+ * @async
+ * @function processFile
+ * @memberof empolisOps
+ * @param {object} dataObject - object containing the relevant file properties and metadata
+ * @requires ./empolis_functions.js
+ * @requires ./helpers.js
+ * @returns nothing
+ */
+async function processFile({ dataObject }) {
+  logger.info(`processFile() started. Processing ${dataObject.filename}`);
+  logger.debug(`dataObject: ${util.inspect(dataObject, { depth: null, colors: false })}`);
+
+  // Search for file in the user selected data source to get the current metadata
+  const fileMetadata = await fileSearch({ searchTerm: dataObject.filename, consoleOutput: false });
+
+  let newKeywords = '';
+  if (dataObject.breadcrumbs) {
+    for (const keyword of dataObject.breadcrumbs) {
+      newKeywords = newKeywords + keyword + '; ';
+    }
+    newKeywords = newKeywords.trim();
+  }
+  // Check if 'Title' and 'Keywords' are already correct
+  if (fileMetadata.Title && dataObject.title) {
+    if (fileMetadata.Title.toLowerCase() === dataObject.title.toLowerCase()) {
+      logger.info(`${dataObject.filename} already has the correct title`);
+      // Return if keywords and title already match
+      if (fileMetadata.Keywords_txt) {
+        if (fileMetadata.Keywords_txt.toLowerCase() === newKeywords.toLowerCase()) {
+          logger.info(
+            `${dataObject.filename} already has the correct title and keywords, metadata will not be updated`
+          );
+          return;
+        }
+      }
+      // Return if title matches, entry has no keywords, and there are no new keywords to be added
+      else if (newKeywords.length === 0) {
+        logger.info(
+          `Keywords for ${dataObject.filename} do not exist and title is correct, metadata will not be updated`
+        );
+        return;
+      }
+    }
+  }
+  // Build new metadata object with Title and optional Keywords
+  let newMetadata = { ...fileMetadata, Title: dataObject.title };
+  if (newKeywords.length > 0) {
+    newMetadata = { ...newMetadata, Keywords_txt: newKeywords };
+  }
+  logPrettyJson(newMetadata, 'newMetadata');
+
+  const editMetadataResponse = await editFileMetadata({ newMetadata });
+  if (editMetadataResponse === 202) {
+    logger.info(`${dataObject.filename} metadata modified successfully`);
+  } else {
+    logger.error(`Failed to modify metadata for ${dataObject.filename}`);
   }
 }
 
@@ -59,41 +154,34 @@ export async function getFileMetadata({ authToken, path }) {
  * @async
  * @function editFileMetadata
  * @memberof empolisOps
- * @param {string} authToken - authentication token for API requests
  * @param {object} newMetadata - new metadata for the specified file
  * @returns {Promise<JSON>} API request response body
  * @requires got
  */
 
-export async function editFileMetadata({ authToken, newMetadata }) {
+export async function editFileMetadata({ newMetadata }) {
   logger.debug(`editFileMetadata() started`);
+  const config = getConfig();
 
   if (!newMetadata?.FilePath?.length) {
     throw new Error(FILE_PATH_ERROR);
   }
 
+  const API_TOKEN = await getToken();
+
   // Define got() request options
   const url = `${config.BASE_URL}/api/ingest/${config.INGEST_API_VERSION}/metadata/environment/project1_p`;
-  const method = 'POST';
   const headers = {
-    Authorization: `Bearer ${authToken}`,
+    Authorization: `Bearer ${API_TOKEN}`,
     'Content-Type': 'application/json',
   };
   const body = JSON.stringify(newMetadata);
-  const options = { url, method, headers, body };
+  const options = { headers, body };
 
   try {
     // Make update request to Empolis API
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
-    logResponse(response, 'editFileMetadata() got response');
+    const response = await got.post(url, options);
+    logResponse(response, 'editFileMetadata() got.post response');
 
     // Return the response statusCode
     return response.statusCode;
@@ -110,67 +198,59 @@ export async function editFileMetadata({ authToken, newMetadata }) {
 }
 
 /**
+ * @ignore
  * Function to get a record with a specific ID from the Empolis index using the IAS Service API.
  * <br>See ['Get Index Record' documentation]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/api/ias/index.html#tag/Record-Management/operation/IasIndexIndexNameRecordIdGet}.
  * @async
  * @function getRecord
  * @memberof empolisOps
- * @param {string} authToken - authentication token for API requests
  * @param {string} recordId - record ID ('_id' attribute in search result)
  * @returns {Promise<JSON>} index record with all properties (if found)
  * @requires got
  */
-
-export async function getRecord({ authToken, recordId }) {
+/*async function getRecord({ recordId }) {
   logger.debug(`getRecord() started`);
+  const config = getConfig();
+  const API_TOKEN = await getToken();
 
   const endpoint = `/api/ias/${config.IAS_API_VERSION}/index/project1_p/record/${recordId}`;
   const url = config.BASE_URL + endpoint;
 
-  // Define got() request options
+  // Define got.get() request options
   const options = {
-    url,
-    method: 'GET',
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Bearer ${API_TOKEN}`,
     },
   };
 
   try {
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
-    logResponse(response, 'getRecord() got response');
+    const response = await got.get(url, options);
+    logResponse(response, 'getRecord() got.get response');
 
     return JSON.parse(response.body);
   } catch (error) {
     console.error(`getRecord() Error:\n${error}`);
     logger.error(`getRecord() Error:\n${error}`);
   }
-}
+}*/
 
 /**
+ * @ignore
  * Function to update a record with a specific ID in the Empolis index using the IAS Service API.
  * <br>See ['Add Record' documentation]{@link https://yaskawa2.esc-eu-central-1.empolisservices.com/doc/api/ias/index.html#tag/Record-Management/operation/IasIndexIndexNameRecordPost}.
  * <br>CAUTION: all attributes and content for the record must be sent in the update request, it is not an incremental update! The previous record is deleted!
  * @async
  * @function updateRecord
  * @memberof empolisOps
- * @param {string} authToken - authentication token for API requests
  * @param {string} recordId  - record ID ('_recordid' attribute in search result)
  * @param {object} updatedRecord - updated record, including all metadata and content
  * @returns {Promise<JSON>} API request response body
  *
  */
-
-export async function updateRecord({ authToken, recordId, updatedRecord }) {
+/*async function updateRecord({ recordId, updatedRecord }) {
   logger.debug(`updateRecord() started`);
+  const config = getConfig();
+  const API_TOKEN = await getToken();
 
   const endpoint = `/api/ias/${config.IAS_API_VERSION}/index/project1_p/record`;
   const url = config.BASE_URL + endpoint;
@@ -182,10 +262,8 @@ export async function updateRecord({ authToken, recordId, updatedRecord }) {
 
   // Define got() request options
   const options = {
-    url,
-    method: 'POST',
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -193,15 +271,7 @@ export async function updateRecord({ authToken, recordId, updatedRecord }) {
 
   try {
     // Make update request to Empolis API
-    const response = await got(options).catch((error) => {
-      if (isJSON(error.response.body)) {
-        const errorBody = JSON.parse(error.response.body);
-        console.error(
-          `  got() Error: ${errorBody.statusCode} ${errorBody.error}\n  ${errorBody.message}`
-        );
-      }
-      throw new Error('got() Error');
-    });
+    const response = await got.post(url, options);
     logResponse(response, 'updateRecord() got response');
 
     // Return the response body as JSON
@@ -210,4 +280,4 @@ export async function updateRecord({ authToken, recordId, updatedRecord }) {
     console.error(`updateRecord() Error:\n${error}`);
     logger.error(`updateRecord() Error:\n${error}`);
   }
-}
+}*/
