@@ -14,26 +14,43 @@ import logger from './logger.js';
  */
 
 /**
- * Function to get all the filenames with .html or .htm ending from a specified directory.
+ * Function to get all the filenames with the specified extensions from a directory.
  * @async
- * @function getHtmlFiles
+ * @function getFilesByExtensions
  * @memberof fileOperations
  * @param {string} directory - location of the directory to get filenames from
  * @returns {Promise<array>} Array with all .html and .htm filenames, empty if no .html or .htm files found
  */
+export async function getFilesByExtensions(directory) {
+  const allowedExtensions = [
+    '.html', '.htm', '.pdf', '.doc', '.docx', 
+    '.xls', '.xlsx', '.ppt', '.pptx', '.zip', '.mp4'
+  ];
 
-export async function getHtmlFiles(directory) {
+  // Nested function to recursively get files from subdirectories
+  async function getFiles(dir) {
+    let files = await fs.readdir(dir, { withFileTypes: true });
+    let fileList = [];
+
+    for (const file of files) {
+      const res = path.resolve(dir, file.name);
+      if (file.isDirectory()) {
+        fileList = fileList.concat(await getFiles(res));
+      } else if (allowedExtensions.includes(path.extname(file.name).toLowerCase())) {
+        fileList.push(path.relative(directory, res));
+      }
+    }
+
+    return fileList;
+  }
+
   try {
-    let files = await fs.readdir(directory);
-    files = files.filter(
-      (file) =>
-        path.extname(file).toLowerCase() === '.html' || path.extname(file).toLowerCase() === '.htm'
-    );
-    if (files.length === 0) throw new Error(`No HTML files found in ${directory}`);
+    const files = await getFiles(directory);
+    if (files.length === 0) throw new Error(`No files with allowed extensions found in ${directory}`);
     return files;
   } catch (error) {
-    logger.error(`getHtmlFiles() Error:\n${error}`);
-    throw new Error(`Failed to get HTML files: ${error.message}`);
+    logger.error(`getFilesByExtensions() Error:\n${error}`);
+    throw new Error(`Failed to get files: ${error.message}`);
   }
 }
 
