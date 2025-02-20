@@ -145,20 +145,18 @@ export async function getToken() {
  */
 async function refreshAccessToken(refreshToken) {
   logger.debug('Attempting to refresh access token');
-  const config = getConfig();
-  const { CLIENT_ID, CLIENT_SECRET } = process.env;
-  const url = `${config.BASE_URL}/oauth2/token`;
-
-  const options = {
-    username: CLIENT_ID,
-    password: CLIENT_SECRET,
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded',
-    },
-    body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
-  };
-
   try {
+    const config = getConfig();
+    const { CLIENT_ID, CLIENT_SECRET } = process.env;
+    const url = `${config.BASE_URL}/oauth2/token`;
+    const options = {
+      username: CLIENT_ID,
+      password: CLIENT_SECRET,
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
+    };
     const response = await got.post(url, options);
     logResponse(response, 'refreshAccessToken() got response');
     return JSON.parse(response.body);
@@ -173,7 +171,6 @@ async function refreshAccessToken(refreshToken) {
  * @async
  * @function checkApiStatus
  * @memberof empolisAdmin
- * @param {string} authToken - authentication token for API requests
  * @requires ./empolis_functions.js
  * @returns error if an API is not operational
  */
@@ -225,23 +222,16 @@ export async function checkApiStatus() {
  */
 async function apiOperational({ authToken, apiName, apiVersion }) {
   logger.debug(`apiOperational(${apiName}, ${apiVersion}) started`);
-  const config = getConfig();
-  const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`;
-
-  // Define got() request options
-  const options = {
-    url,
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
-  };
-
   try {
-    const response = await got(options);
-    logResponse(response, 'apiOperational() got response');
-
-    // Return the status (opearational true/false) of the specified Empolis Ingest API version
+    const config = getConfig();
+    const url = `${config.BASE_URL}/api/${apiName}/${apiVersion}/alive`;
+    const options = {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+    const response = await got.get(url, options);
+    logResponse(response, 'apiOperational() got.get response');
     return JSON.parse(response.body).operational;
   } catch (error) {
     console.error(`apiOperational() Error:\n${error}`);
