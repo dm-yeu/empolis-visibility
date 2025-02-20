@@ -79,7 +79,6 @@ export async function updateCloudMetadata({ fileList, indexFile }) {
  * <br> Only modifies metadata with editFileMetadata() if it does not have the correct value already
  * @async
  * @function processFile
- * @param {string} authToken - authentication token for API requests
  * @param {string} file - filename of the file to process
  * @param {string} htmlTitle - title extracted from the HTML file
  * @requires ./empolis_functions.js
@@ -144,7 +143,6 @@ async function processFile({ dataObject }) {
  * @async
  * @function editFileMetadata
  * @memberof empolisOps
- * @param {string} authToken - authentication token for API requests
  * @param {object} newMetadata - new metadata for the specified file
  * @returns {Promise<JSON>} API request response body
  * @requires got
