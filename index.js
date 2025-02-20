@@ -1,8 +1,9 @@
 // Imports
+import { loadConfig, setConfig, getConfig } from './config.js';
 import { getToken } from './empolis_admin.js';
 import { fileSearch } from './empolis_search.js';
 import { editFileMetadata } from './empolis_ops.js';
-import { loadConfig, getHtmlFiles, readJsonData } from './helpers.js';
+import { getHtmlFiles, readJsonData } from './helpers.js';
 import { createFileIndex } from './index_creation.js';
 import logger, { configureLogger, logPrettyJson } from './logger.js';
 import { performance } from 'node:perf_hooks';
@@ -18,12 +19,12 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: __dirname + `/.env` });
 
 // Initialize basic config for logger
-const initialConfig = await loadConfig({ promptUser: false, testApi: false });
+const initialConfig = await loadConfig();
 configureLogger(initialConfig);
-
-// Load full config with user prompt
-export let config = await loadConfig({ promptUser: true, testApi: true });
-logger.debug(`config:\n${config}`);
+setConfig(initialConfig);
+// Load full config with user prompt and api test
+const fullConfig = await loadConfig({ promptUser: true, testApi: true });
+setConfig(fullConfig);
 
 /**
  * Main function.
@@ -42,7 +43,8 @@ logger.debug(`config:\n${config}`);
 
 async function main() {
   const startTime = performance.now();
-  logger.info(`Run of empolis-visibility main() started`);
+  let config = getConfig();
+  logger.debug(`main() function started`);
 
   try {
     let newOperation = true;
@@ -61,15 +63,19 @@ async function main() {
       if (config.OPERATION === 'file_search') {
         const searchTerm = await input({ message: 'Enter the filename to search for:' });
         const fileMetadata = await fileSearch({ searchTerm, consoleOutput: true });
-        logger.info(`fileMetadata:\n${JSON.stringify(fileMetadata)}`);
+        if (fileMetadata) logger.info(`fileMetadata:\n${JSON.stringify(fileMetadata)}`);
       }
       // Prompt user to perform another operation
       newOperation = await confirm(
         { message: 'Perform another operation', default: false },
-        { signal: AbortSignal.timeout(10000) }
+        { signal: AbortSignal.timeout(60000) }
       );
       if (newOperation) {
-        config = await loadConfig({ promptUser: true });
+        logger.info(`User selected to perform another operation`);
+        setConfig(await loadConfig({ promptUser: true }));
+        config = getConfig();
+      } else {
+        logger.info(`User selected to end the program`);
       }
     }
   } catch (error) {
@@ -103,6 +109,7 @@ async function main() {
  */
 async function createUpdateIndexFile() {
   try {
+    const config = getConfig();
     // Prompt user to confirm the directory for the source files of the data source
     config.OK = await confirm({
       message: `The directory for the files of data source '${config.dataSourceSelection}' is '${config.FILE_DIR}'. Continue?`,
@@ -158,6 +165,7 @@ async function createUpdateIndexFile() {
  * @returns {Promise<null>} null
  */
 async function updateCloudMetadata({ fileList, indexFile }) {
+  const config = getConfig();
   const API_TOKEN = await getToken();
   // Load the full index of files from the index file
   const index = await readJsonData(indexFile);
